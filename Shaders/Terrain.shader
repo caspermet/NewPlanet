@@ -122,6 +122,7 @@
 				float3 n = normalize(float3(wolrldPosition.x, wolrldPosition.y, wolrldPosition.z));
 				float uu = atan2(n.z, n.x) / (2 * PI) + 0.5;
 				float vv = n.y * 0.5 + 0.5;
+
 				float uMap = uu * 4;
 				
 				int xindex = int(uMap);
@@ -132,8 +133,8 @@
 				float uCoor = (uu - (float(xindex) - 1.0f) * 0.25f) * 4;
 				float vCoor = (vv - float(vMap) * 0.5f) * 2;
 				
-				//fixed4 c = UNITY_SAMPLE_TEX2DARRAY(_PlanetTextures, float3(float2(uCoor, vCoor), index));
-				fixed4 c = tex2D(_MainTex, float2(uu,vv));			
+				fixed4 c = UNITY_SAMPLE_TEX2DARRAY(_PlanetTextures, float3(float2(uCoor, vCoor), index));
+			//	fixed4 c = tex2D(_MainTex, float2(uu,vv));			
 				o.Albedo = c.rgb;
 				o.Alpha = 1;
 			}
