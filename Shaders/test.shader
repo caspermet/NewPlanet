@@ -4,7 +4,7 @@
 		_MainTex("Albedo (RGB)", 2D) = "white" {}
 		_HeightTex("HeighMap", 2D) = "white" {}
 		_PlanetTextures("Textures", 2DArray) = "" {}
-		 _Tess("Tessellation", Range(1,32)) = 4
+		_Tess("Tessellation", Range(1,32)) = 4
 	}
 		SubShader{
 
@@ -16,13 +16,14 @@
 
 				#pragma vertex vert
 				#pragma fragment frag
-				#pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight tessellate:tessFixed
+				#pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
+		
 				#pragma target 4.6
-				#include "Tessellation.cginc"
 
 				#include "UnityCG.cginc"
 				#include "UnityLightingCommon.cginc"
 				#include "AutoLight.cginc"
+				 #include "Tessellation.cginc"
 
 				#define PI 3.141592653589793238462643383279 
 
@@ -43,13 +44,6 @@
 				StructuredBuffer<float4> positionBuffer;
 				StructuredBuffer<float4> directionsBuffer;
 			#endif
-
-				float _Tess;
-
-				float4 tessFixed()
-				{
-					return _Tess;
-				}
 
 				struct v2f
 				{
