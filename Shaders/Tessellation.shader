@@ -73,7 +73,7 @@ Shader "Custom/Tessellation" {
 			struct HS_CONSTANT_OUTPUT
 			{
 				float edges[3] : SV_TessFactor;
-				float inside : SV_InsideTessFactor;
+				float inside : SV_InsideTessFactor; 
 			};
 
 			HS_CONSTANT_OUTPUT HSConst()
