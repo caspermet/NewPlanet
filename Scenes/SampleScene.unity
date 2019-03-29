@@ -1066,7 +1066,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1551128094}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -57.2, y: 0, z: 0}
+  m_LocalPosition: {x: -64.2, y: 0, z: 3.1}
   m_LocalScale: {x: 50, y: 50, z: 50}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1120,8 +1120,7 @@ MonoBehaviour:
   - {fileID: 2800000, guid: eaa815cda50b1e84eb8141ec4550820b, type: 3}
   - {fileID: 2800000, guid: 190840cd04de9294cbdce0ce41f78142, type: 3}
   - {fileID: 2800000, guid: e405b6e1d5c25414ebd82537de001e1f, type: 3}
-  tesselattionMaterial: {fileID: 2100000, guid: ba2e52b2d5b15d24d890a14deb5a9d73,
-    type: 2}
+  atmosphereMaterial: {fileID: 0}
   planetTextureRange:
   - 1
   - 1

@@ -7,12 +7,12 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Tessellation
-  m_Shader: {fileID: 4800000, guid: 9708244c8da684e49ba17660537fc65a, type: 3}
+  m_Shader: {fileID: 4800000, guid: c4a003b05873e3641b3014b445dee1c9, type: 3}
   m_ShaderKeywords: FT_EDGE_TESS
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2000
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
@@ -82,7 +82,7 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _Tess: 1
+    - _Tess: 12.4
     - _TessEdge: 16
     - _TessMode: 1
     - _UVSec: 0
@@ -91,5 +91,6 @@ Material:
     - _test: 0.5
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _DiffuseColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}

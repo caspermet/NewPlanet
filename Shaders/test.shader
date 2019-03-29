@@ -4,7 +4,8 @@
 		_MainTex("Albedo (RGB)", 2D) = "white" {}
 		_HeightTex("HeighMap", 2D) = "white" {}
 		_PlanetTextures("Textures", 2DArray) = "" {}
-		_Tess("Tessellation", Range(1,32)) = 4
+		_Tess("Tessellation", int) = 4
+		_BlendAlpha("Blend Alpha", float) = 0
 	}
 		SubShader{
 
@@ -29,6 +30,7 @@
 
 				sampler2D _MainTex;
 				sampler2D _HeightTex;
+				int _Tess;
 
 				UNITY_DECLARE_TEX2DARRAY(_PlanetTextures);
 
@@ -45,15 +47,30 @@
 				StructuredBuffer<float4> directionsBuffer;
 			#endif
 
+
+
 				struct v2f
 				{
 					float4 pos : SV_POSITION;
+					float3 worldPosition : TEXCOORD5;
 					float2 uv_HeightTex : TEXCOORD0;
 					float3 ambient : TEXCOORD1;
 					float3 diffuse : TEXCOORD2;
 					float3 color : TEXCOORD3;
+
 					SHADOW_COORDS(4)
 				};
+
+
+				inline float2 RadialCoords(float3 a_coords)
+				{
+					float3 a_coords_n = normalize(a_coords);
+					float lon = atan2(a_coords_n.z, a_coords_n.x);
+					float lat = acos(a_coords_n.y);
+					float2 sphereCoords = float2(lon, lat) * (1.0 / PI);
+					return float2(sphereCoords.x * 0.5 + 0.5, 1 - sphereCoords.y);
+
+				}
 
 
 				v2f vert(appdata_full v, uint instanceID : SV_InstanceID)
@@ -94,21 +111,37 @@
 					float dz = z * sqrt(1.0f - (x*x * 0.5f) - (y * y * 0.5f) + (x*x*y*y / 3.0f));
 
 					worldPosition.xyz = float3(dx, dy, dz) * _PlanetInfo.x;;
-
+				
 					float3 n = normalize(float3(worldPosition.x, worldPosition.y, worldPosition.z));
-					float uCoor = atan2(n.z, n.x) / (2 * PI) + 0.5;
-					float vCoor = n.y * 0.5 + 0.5;
+					float uCoor = atan2(n.z, n.x) / (2 * PI) + 0.5f;
+					float vCoor = asin(n.y) / PI - 0.5f;
+					//float2 equiUV = RadialCoords(v.normal);
 
-					worldPosition.xyz = (worldPosition.xyz + normalize(worldPosition.xyz) * (tex2Dlod(_HeightTex, float4(uCoor, vCoor, 0, 0)) * _PlanetInfo.y)) ;
+					worldPosition.xyz = (worldPosition.xyz + normalize(worldPosition.xyz) * (tex2Dlod(_HeightTex, float4(uCoor, vCoor, 0.0, 0)) * _PlanetInfo.y)) ;
 
 					float3 ndotl = saturate(dot(worldNormal, _WorldSpaceLightPos0.xyz));
 					float3 ambient = ShadeSH9(float4(worldNormal, 1.0f));
 					float3 diffuse = (ndotl * _LightColor0.rgb);
-					float3 color = v.color;
+
+					float3 colora[10] = {
+					float3(0, 1, 0),
+					float3(1, 1, 0),
+					float3(0, 1, 1),
+					float3(0, 0, 0),
+					float3(.5, 1, 0),
+					float3(0, 1, .5),
+					float3(.5, 1, .2),
+					float3(.2, 1, .5),
+					float3(.5, 1, .2),
+					float3(.2, 1, .5),
+				};
+					float3 color = colora[instanceID%10];//v.color;
 
 					v2f o;
+					o.worldPosition = worldPosition;
 					o.pos = mul(UNITY_MATRIX_VP, float4(worldPosition, 1.0f));
 					o.uv_HeightTex = float2(uCoor, vCoor);
+			
 					o.ambient = ambient;
 					o.diffuse = diffuse;
 					o.color = color;
@@ -118,7 +151,9 @@
 
 				fixed4 frag(v2f i) : SV_Target
 				{
-
+					float3 n = normalize(float3(i.worldPosition.x, i.worldPosition.y, i.worldPosition.z));
+					float uCoor = atan2(n.z, n.x) / (2 * PI) + 0.5f;
+					float vCoor = asin(n.y) / PI - 0.5f;
 					
 					float uMap = i.uv_HeightTex.x * 4;
 					int vMap = i.uv_HeightTex.y >= 0.5f ? 1 : 2;
@@ -127,17 +162,19 @@
 
 					int index = xindex + (i.uv_HeightTex.y >= 0.5f ? 0 : 4);
 
-					float uCoor = (i.uv_HeightTex.x - (float(xindex) - 1.0f) * 0.25f) * 4;
-					float vCoor = (i.uv_HeightTex.y - float(vMap) * 0.5f) * 2;
+					float uCoor2 = (uCoor - (float(xindex) - 1.0f) * 0.25f) * 4;
+					float vCoor2 = (vCoor - float(vMap) * 0.5f) * 2;
 
-					fixed4 c = UNITY_SAMPLE_TEX2DARRAY(_PlanetTextures, float3(float2(uCoor, vCoor), index));
-
+					//fixed4 c = UNITY_SAMPLE_TEX2DARRAY(_PlanetTextures, float3(float2(uCoor2, vCoor2), index));
+					fixed4 c = tex2Dlod(_MainTex, float4(uCoor, vCoor, 0.0, 0));
+					//	return float4 (i.color,1);
 					fixed shadow = SHADOW_ATTENUATION(i);
 					fixed4 albedo = c;
 					float3 lighting = i.diffuse * shadow + i.ambient;
 					fixed4 output = fixed4(albedo.rgb * i.color * lighting, albedo.w);
 					UNITY_APPLY_FOG(i.fogCoord, output);
-					return output;
+					return c;
+
 				}
 
 				ENDCG

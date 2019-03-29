@@ -22,7 +22,7 @@ public class PlanetGenerator : MonoBehaviour
     public Texture2D[] planetTexture;
     public Texture2D[] planetMapTexture;
 
-    public Material tesselattionMaterial;
+    public Material atmosphereMaterial;
 
 
     [Range(0, 1)]
@@ -55,9 +55,8 @@ public class PlanetGenerator : MonoBehaviour
     void createSpehere()
     {
         GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        sphere.GetComponent<Renderer>().material = tesselattionMaterial;
-        sphere.transform.localScale += new Vector3(planetInfo.x * 2, planetInfo.x * 2, planetInfo.x * 2);
-        sphere.transform.position = new Vector3(-50.0f, -0.0f, 0.0f);
+        sphere.GetComponent<Renderer>().material = atmosphereMaterial;
+        sphere.transform.localScale += new Vector3(planetInfo.x * 2 - 5, planetInfo.x * 2 - 5, planetInfo.x * 2 - 5);
     }
 
     void Update()
