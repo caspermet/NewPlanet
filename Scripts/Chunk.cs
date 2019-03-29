@@ -116,7 +116,7 @@ public class Chunk
 
         if (positionsList.Count > 0)
         {
-
+           // drawMesh.UpdateData(positionsList.Count, viewedChunkCoord, directionArray);
             drawMesh.Draw();
         }
     }

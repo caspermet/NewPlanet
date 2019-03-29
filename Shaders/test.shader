@@ -8,7 +8,7 @@
 		_BlendAlpha("Blend Alpha", float) = 0
 	}
 		SubShader{
-
+			 
 			Pass {
 
 				Tags {"LightMode" = "ForwardBase"}
@@ -123,20 +123,6 @@
 					float3 ambient = ShadeSH9(float4(worldNormal, 1.0f));
 					float3 diffuse = (ndotl * _LightColor0.rgb);
 
-					float3 colora[10] = {
-					float3(0, 1, 0),
-					float3(1, 1, 0),
-					float3(0, 1, 1),
-					float3(0, 0, 0),
-					float3(.5, 1, 0),
-					float3(0, 1, .5),
-					float3(.5, 1, .2),
-					float3(.2, 1, .5),
-					float3(.5, 1, .2),
-					float3(.2, 1, .5),
-				};
-					float3 color = colora[instanceID%10];//v.color;
-
 					v2f o;
 					o.worldPosition = worldPosition;
 					o.pos = mul(UNITY_MATRIX_VP, float4(worldPosition, 1.0f));
@@ -144,7 +130,7 @@
 			
 					o.ambient = ambient;
 					o.diffuse = diffuse;
-					o.color = color;
+					//o.color = color;
 					TRANSFER_SHADOW(o)
 					return o;
 				}
@@ -167,7 +153,7 @@
 
 					//fixed4 c = UNITY_SAMPLE_TEX2DARRAY(_PlanetTextures, float3(float2(uCoor2, vCoor2), index));
 					fixed4 c = tex2Dlod(_MainTex, float4(uCoor, vCoor, 0.0, 0));
-					//	return float4 (i.color,1);
+
 					fixed shadow = SHADOW_ATTENUATION(i);
 					fixed4 albedo = c;
 					float3 lighting = i.diffuse * shadow + i.ambient;

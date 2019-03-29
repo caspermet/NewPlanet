@@ -36,8 +36,6 @@ public class PlanetGenerator : MonoBehaviour
         planetInfo.x = maxScale / 2;
         planetInfo.y = maxTerrainHeight;
 
-        Debug.Log(planetInfo.y);
-
         instanceMaterial.SetTexture("_Textures", LoadArrayTexture.DoTexture(planetTexture));
         instanceMaterial.SetTexture("_PlanetTextures", LoadArrayTexture.DoTexture(planetMapTexture));
 
@@ -58,6 +56,7 @@ public class PlanetGenerator : MonoBehaviour
         sphere.GetComponent<Renderer>().material = atmosphereMaterial;
         sphere.transform.localScale += new Vector3(planetInfo.x * 2 - 5, planetInfo.x * 2 - 5, planetInfo.x * 2 - 5);
     }
+
 
     void Update()
     {
