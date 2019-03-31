@@ -29,7 +29,7 @@
 		#include "UnityCG.cginc"
 		#include "Tessellation.cginc"     
 
-			#define PI 3.141592653589793238462643383279 
+		#define PI 3.141592653589793238462643383279 
 
 
 		float _Tess;
@@ -50,6 +50,8 @@
 			float3 normal : NORMAL;
 			float2 uv : TEXCOORD0;
 		};
+
+
 		struct VS_OUTPUT
 		{
 			float4 vertex : INTERNALTESSPOS;
@@ -57,6 +59,7 @@
 			float4 tangent : TANGENT;
 			float2 uv : TEXCOORD0;
 			float4 wordPosition : TEXCOORD1;
+			float tess : TEXCOORD2;
 		};
 
 		struct HS_OUTPUT
@@ -66,6 +69,7 @@
 			float4 tangent : TANGENT;
 			float2 uv : TEXCOORD0;
 			float4 wordPosition : TEXCOORD1;
+			float tess : TEXCOORD2;
 		};
 
 		struct DS_OUTPUT
@@ -77,6 +81,12 @@
 			float4 wordPosition : TEXCOORD1;
 		};
 
+		float4 tessDistance(APP_OUTPUT v0, APP_OUTPUT v1, APP_OUTPUT v2) {
+			float minDist = 10.0;
+			float maxDist = 70.0;
+			return UnityDistanceBasedTess(v0.vertex, v1.vertex, v2.vertex, minDist, maxDist, _Tess);
+		}
+
 #ifdef UNITY_CAN_COMPILE_TESSELLATION
 			struct HS_CONSTANT_OUTPUT
 			{
@@ -84,14 +94,18 @@
 				float inside : SV_InsideTessFactor;
 			};
 
-			HS_CONSTANT_OUTPUT HSConst()
+			HS_CONSTANT_OUTPUT HSConst(InputPatch<VS_OUTPUT, 3> v)
 			{
 				HS_CONSTANT_OUTPUT o;
+				float4 tf;
 
-				o.edges[0] = _Tess;
-				o.edges[1] = _Tess;
-				o.edges[2] = _Tess;
-				o.inside = _Tess;
+				APP_OUTPUT vi[3];
+				vi[0].vertex = v[0].vertex;
+				vi[1].vertex = v[1].vertex;
+				vi[2].vertex = v[2].vertex;
+
+				tf = tessDistance(vi[0], vi[1], vi[2]);
+				o.edges[0] = tf.x; o.edges[1] = tf.y; o.edges[2] = tf.z; o.inside = tf.w;
 
 				return o;
 			}
@@ -100,6 +114,17 @@
 
 			StructuredBuffer<float4> positionBuffer;
 			StructuredBuffer<float4> directionsBuffer;
+
+
+			float3 CalcUVFromHM(float3 position) {
+				float3 n = normalize(float3(position.x, position.y, position.z));
+				float uCoor = atan2(n.z, n.x) / (2 * PI) + 0.5f;
+				float vCoor = asin(n.y) / PI - 0.5f;
+
+				float3 worldPosition = (position.xyz + n * (tex2Dlod(_HeightTex, float4(uCoor, vCoor, 0.0, 0)) * _PlanetInfo.y));
+
+				return worldPosition;
+			}
 
 
 			VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
@@ -138,18 +163,19 @@
 
 				worldPosition.xyz = float3(dx, dy, dz) * _PlanetInfo.x;;
 
-				float3 n = normalize(float3(worldPosition.x, worldPosition.y, worldPosition.z));
+			/*	float3 n = normalize(float3(worldPosition.x, worldPosition.y, worldPosition.z));
 				float uCoor = atan2(n.z, n.x) / (2 * PI) + 0.5f;
-				float vCoor = asin(n.y) / PI - 0.5f;
+				float vCoor = asin(n.y) / PI - 0.5f;*/
 				//float2 equiUV = RadialCoords(v.normal);
 
-				worldPosition.xyz = (worldPosition.xyz + normalize(worldPosition.xyz) * (tex2Dlod(_HeightTex, float4(uCoor, vCoor, 0.0, 0)) * _PlanetInfo.y));
+				worldPosition.xyz = CalcUVFromHM(worldPosition);
 
 				o.wordPosition = mul(UNITY_MATRIX_MV, float4(worldPosition, 1.0f));
 				o.wordPosition = float4(worldPosition, 1.0f);
 				o.vertex = float4(worldPosition, 1.0f);
 				o.normal = v.normal;
 				o.uv = v.uv;
+				o.tess = transform.w;
 				//o.vertex = UnityObjectToClipPos(o.vertex);
 				return o;
 
@@ -170,6 +196,7 @@
 				o.tangent = ip[id].tangent;
 				o.uv = ip[id].uv;
 				o.wordPosition = ip[id].wordPosition;
+				o.tess = ip[id].tess;
 
 				return o;
 			}
@@ -210,8 +237,6 @@
 
 				fixed4 albedo = c;
 		
-				return c;
-
 				return c;
 			}
 			ENDCG

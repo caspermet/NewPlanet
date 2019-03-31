@@ -80,13 +80,20 @@ public class ChunkFace
 
         else
         {
+            float tessellation = CalculeTessellatio(dist);
+            Vector4 newDirection = new Vector4(directionX.x, directionX.y, directionX.z, tessellation);
             positionsList.Clear();
             directionList.Clear();
             positionsList.Add(positionToDraw);
-            directionList.Add(directionX);
+            directionList.Add(newDirection);
         }
 
         return positionsList;
+    }
+
+    private float CalculeTessellatio(float distance)
+    {
+        return (distance * 100)/(4 * scale - scale) * 2 + 1;
     }
 
     public ChunkFace[] getChunkTree()
