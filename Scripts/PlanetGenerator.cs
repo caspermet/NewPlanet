@@ -31,7 +31,8 @@ public class PlanetGenerator : MonoBehaviour
 
     void Start()
     {
-
+        Debug.Log(camera.fieldOfView);
+        Debug.Log(camera.nearClipPlane);
         // planetInfo.x = (chunkSize - 1) * maxScale / 2;
         planetInfo.x = maxScale / 2;
         planetInfo.y = maxTerrainHeight;
@@ -43,9 +44,9 @@ public class PlanetGenerator : MonoBehaviour
         instanceMaterial.SetFloatArray("_TexturesArray", planetTextureRange);
         instanceMaterial.SetVector("_PlanetInfo", planetInfo);
 
-        createSpehere();
-        Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
-        Debug.Log(planes[2]);
+      //  createSpehere();
+       // Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
+    //    Debug.Log(planes[2]);
 
         chunk = new Chunk(maxScale, chunkSize, instanceMaterial, viewer);
     }
@@ -60,10 +61,11 @@ public class PlanetGenerator : MonoBehaviour
 
     void Update()
     {
+   
         instanceMaterial.SetInt("_TexturesArrayLength", planetTextureRange.Length);
         instanceMaterial.SetFloatArray("_TexturesArray", planetTextureRange);
 
-        chunk.Update(instanceMaterial);
+      //  chunk.Update(instanceMaterial);
     }
 
     void OnDisable()

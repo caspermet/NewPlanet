@@ -14,7 +14,7 @@ public class FlyCamera : MonoBehaviour
     space : Moves camera on X and Z axis only.  So camera doesn't gain any height*/
 
 
-    float mainSpeed = 5.0f; //regular speed
+    float mainSpeed = 500.0f; //regular speed
     float shiftAdd = 2500.0f; //multiplied by how long shift is held.  Basically running
     float maxShift = 15000.0f; //Maximum speed when holdin gshift
     float camSens = 0.25f; //How sensitive it with mouse
