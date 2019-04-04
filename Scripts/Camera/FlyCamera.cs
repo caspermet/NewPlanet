@@ -10,7 +10,7 @@ public class FlyCamera
     private float slowMoveFactor = 0.25f;
     private float fastMoveFactor = 3;
 
-    private float minSpeed = 50;
+    private float minSpeed = 5;
     private float maxSpeed ;
 
 
@@ -51,7 +51,7 @@ public class FlyCamera
         SetSpeedByDistance();
         rotationX += Input.GetAxis("Mouse X") * cameraSensitivity * Time.deltaTime;
         rotationY += Input.GetAxis("Mouse Y") * cameraSensitivity * Time.deltaTime;
-        rotationY = Mathf.Clamp(rotationY, -90, 90);
+        //rotationY = Mathf.Clamp(rotationY, -180, 180);
 
         camera.transform.localRotation = Quaternion.AngleAxis(rotationX, Vector3.up);
         camera.transform.localRotation *= Quaternion.AngleAxis(rotationY, Vector3.left);

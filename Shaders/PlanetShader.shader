@@ -5,7 +5,8 @@
 		_HeightTex("HeighMap", 2D) = "white" {}
 		_PlanetTextures("Textures", 2DArray) = "" {}
 		_Tess("Tessellation", int) = 4
-		_BlendAlpha("Blend Alpha", float) = 0
+
+		_BlendAlpha("Blend Alpha", Range(0,4)) = 0
 	}
 		SubShader{
 

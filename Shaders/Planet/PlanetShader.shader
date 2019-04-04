@@ -8,8 +8,11 @@
 		_PlanetTexturesBottom("Textures", 2DArray) = "" {}
 		_PlanetHeightMapTop("Textures", 2DArray) = "" {}
 		_PlanetHeightMapBottom("Textures", 2DArray) = "" {}
-		_Tess("Tessellation", Range(1,32)) = 4
+		_Tess("Tessellation", Range(0,2)) = 4
+		_Tesss("tttt", Range(0,512)) = 4
 		_DiffuseColor("Diffuse Color", color) = (0.5,0.5,0.5,0.5)
+
+		[MaterialToggle] _FlipNoise("NoiseMap", Float) = 0
 	}
 		SubShader
 	{
@@ -31,9 +34,11 @@
 			#define PI 3.141592653589793238462643383279 
 
 		float _Tess;
+		float _Tesss;
 		float4 _DiffuseColor;
 		sampler2D _MainTex;
 		sampler2D _HeightTex;
+		float _FlipNoise;
 
 		//#pragma multi_compile_fwdbase
 

@@ -373,7 +373,7 @@ GameObject:
   - component: {fileID: 1740869425}
   - component: {fileID: 1740869424}
   m_Layer: 0
-  m_Name: MapGenerator
+  m_Name: PlanetGenerator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -393,9 +393,9 @@ MonoBehaviour:
   viewer: {fileID: 1540986314}
   instanceMaterial: {fileID: 2100000, guid: 146d4615ee2e36e478c30c0e70e88a41, type: 2}
   camera: {fileID: 1540986313}
-  maxScale: 8142
+  maxScale: 12742
   chunkSize: 32
-  maxTerrainHeight: 1
+  maxTerrainHeight: 80
   planetTexture:
   - {fileID: 2800000, guid: 69dd8e0340637544a9b3c7d260f5f081, type: 3}
   - {fileID: 2800000, guid: dd95653a31752fc4699619f88d5ea5e0, type: 3}

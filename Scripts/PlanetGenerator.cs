@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlanetGenerator : MonoBehaviour
 {
-
+    public float noise = 20;
     public Transform viewer;
     public Material instanceMaterial;
     public Camera camera;
@@ -35,31 +35,39 @@ public class PlanetGenerator : MonoBehaviour
     public float[] planetTextureRange;
     private float[] planetTextureRangeOld;
 
+
+    GameObject sphere;
+
     void Start()
     {
       
         planetInfo.x = maxScale / 2;
         planetInfo.y = maxTerrainHeight;
 
-        Debug.Log("top");
-       // instanceMaterial.SetTexture("_Textures", LoadArrayTexture.DoTexture(planetTexture));
+        cameraEditor = new CameraEdit(camera, maxScale / 2);
+        CreateSpehere();
+        SetMaterialProperties();
+        chunk = new Chunk(maxScale, chunkSize, instanceMaterial, camera);
+    }
+
+
+    void SetMaterialProperties()
+    {
         instanceMaterial.SetTexture("_PlanetTexturesTop", LoadArrayTexture.DoTexture(planetMapTextureTop));
         instanceMaterial.SetTexture("_PlanetTexturesBottom", LoadArrayTexture.DoTexture(planetMapTextureBottom));
         instanceMaterial.SetTexture("_PlanetHeightMapTop", LoadArrayTexture.DoTexture(planetHeightMapTop));
         instanceMaterial.SetTexture("_PlanetHeightMapBottom", LoadArrayTexture.DoTexture(planetHeightMapBottom));
+        instanceMaterial.SetTexture("_noiseTexture", PerlingNoise.CreateNoise(512, noise));
+
         instanceMaterial.SetInt("_TexturesArrayLength", planetTextureRange.Length);
         instanceMaterial.SetFloatArray("_TexturesArray", planetTextureRange);
+        instanceMaterial.SetVector("_CameraPosition", camera.transform.position);
         instanceMaterial.SetVector("_PlanetInfo", planetInfo);
-
-        cameraEditor = new CameraEdit(camera, maxScale / 2);
-        createSpehere();
-
-        chunk = new Chunk(maxScale, chunkSize, instanceMaterial, camera);
     }
 
-    void createSpehere()
+    void CreateSpehere()
     {
-        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         sphere.GetComponent<Renderer>().material = atmosphereMaterial;
         sphere.transform.localScale += new Vector3(planetInfo.x * 2 - 5, planetInfo.x * 2 - 5, planetInfo.x * 2 - 5);
     }
@@ -67,9 +75,10 @@ public class PlanetGenerator : MonoBehaviour
 
     void Update()
     {
-   
         instanceMaterial.SetInt("_TexturesArrayLength", planetTextureRange.Length);
         instanceMaterial.SetFloatArray("_TexturesArray", planetTextureRange);
+        instanceMaterial.SetVector("_CameraPosition", camera.transform.position);
+       
         cameraEditor.cameraUpdate();
         chunk.Update(instanceMaterial);
     }

@@ -4,6 +4,9 @@
 				y -> Max terrain height
 		********************************************************************/
 float3 _PlanetInfo;
+float3 _CameraPosition;
+sampler2D _noiseTexture;
+
 UNITY_DECLARE_TEX2DARRAY(_PlanetHeightMapTop);
 UNITY_DECLARE_TEX2DARRAY(_PlanetHeightMapBottom);
 
@@ -33,27 +36,41 @@ float3 CalcUVFromHM(float3 position) {
 	float3 n = normalize(float3(position.x, position.y, position.z));
 	float uCoor = atan2(n.z, n.x) / (2 * PI) + 0.5f;
 	float vCoor = asin(n.y) / PI + 0.5f;
+	float3 worldPosition;
+	float4 noiseValue = float4(0,0,0,0);
 
-	float uMap = uCoor * 4;
-	int vMap = vCoor >= 0.5f ? 1 : 2;
-
-	int xindex = int(uMap);
-
-	int index = xindex + (vCoor >= 0.5f ? 0 : 4);
-
-	float uCoor2 = (uCoor * 4 - (float(xindex)));
-	float vCoor2 = (vCoor - float(vMap) * 0.5f) * 2;
-
-	//float3 worldPosition = (position.xyz + n * (tex2Dlod(_HeightTex, float4(uCoor, vCoor, 0.0, 0)) * _PlanetInfo.y));
-	float4 c;
-	if (vCoor >= 0.5f) {
-		 c = UNITY_SAMPLE_TEX2DARRAY_LOD(_PlanetHeightMapTop, float3(uCoor2, vCoor2, index), 0);
+	float dist = (distance(float3(0,0,0),  _CameraPosition)) - _PlanetInfo.x;
+	if (dist > _PlanetInfo.x * 0.5) {
+		worldPosition = (position.xyz + n * (tex2Dlod(_HeightTex, float4(uCoor, vCoor, 0.0, 0)) * _PlanetInfo.y));
 	}
 	else {
-		 c = UNITY_SAMPLE_TEX2DARRAY_LOD(_PlanetHeightMapBottom, float3(uCoor2, vCoor2, index), 0);
-	}
-	float3 worldPosition = (position.xyz + n * c.xyz * _PlanetInfo.y);
+		float uMap = uCoor * 4;
+		int vMap = vCoor >= 0.5f ? 1 : 2;
 
+		int xindex = int(uMap);
+
+		int index = xindex + (vCoor >= 0.5f ? 0 : 4);
+
+		float uCoor2 = (uCoor * 4 - (float(xindex)));
+		float vCoor2 = (vCoor - float(vMap) * 0.5f) * 2;
+
+		//float3 worldPosition = (position.xyz + n * (tex2Dlod(_HeightTex, float4(uCoor, vCoor, 0.0, 0)) * _PlanetInfo.y));
+		float4 c;
+		if (vCoor >= 0.5f) {
+			c = UNITY_SAMPLE_TEX2DARRAY_LOD(_PlanetHeightMapTop, float3(uCoor2, vCoor2, index), 0);
+		}
+		else {
+			//c = float3(1, 1, 1);
+			c = UNITY_SAMPLE_TEX2DARRAY_LOD(_PlanetHeightMapBottom, float3(uCoor2, vCoor2, index), 0);
+		}
+
+		if (dist < 400 && _FlipNoise == 1) {
+			noiseValue = tex2Dlod(_noiseTexture, float4(uCoor * _Tesss, vCoor * _Tesss, 0.0, 0)) * _Tess;
+		}
+	
+
+		worldPosition = (position.xyz + n * (c.xyz + noiseValue.xyz) * _PlanetInfo.y);
+	}
 
 	return worldPosition;
 }
