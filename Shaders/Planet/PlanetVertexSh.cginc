@@ -4,6 +4,8 @@
 				y -> Max terrain height
 		********************************************************************/
 float3 _PlanetInfo;
+UNITY_DECLARE_TEX2DARRAY(_PlanetHeightMapTop);
+UNITY_DECLARE_TEX2DARRAY(_PlanetHeightMapBottom);
 
 struct APP_OUTPUT
 {
@@ -30,9 +32,28 @@ StructuredBuffer<float4> directionsBuffer;
 float3 CalcUVFromHM(float3 position) {
 	float3 n = normalize(float3(position.x, position.y, position.z));
 	float uCoor = atan2(n.z, n.x) / (2 * PI) + 0.5f;
-	float vCoor = asin(n.y) / PI - 0.5f;
+	float vCoor = asin(n.y) / PI + 0.5f;
 
-	float3 worldPosition = (position.xyz + n * (tex2Dlod(_HeightTex, float4(uCoor, vCoor, 0.0, 0)) * _PlanetInfo.y));
+	float uMap = uCoor * 4;
+	int vMap = vCoor >= 0.5f ? 1 : 2;
+
+	int xindex = int(uMap);
+
+	int index = xindex + (vCoor >= 0.5f ? 0 : 4);
+
+	float uCoor2 = (uCoor * 4 - (float(xindex)));
+	float vCoor2 = (vCoor - float(vMap) * 0.5f) * 2;
+
+	//float3 worldPosition = (position.xyz + n * (tex2Dlod(_HeightTex, float4(uCoor, vCoor, 0.0, 0)) * _PlanetInfo.y));
+	float4 c;
+	if (vCoor >= 0.5f) {
+		 c = UNITY_SAMPLE_TEX2DARRAY_LOD(_PlanetHeightMapTop, float3(uCoor2, vCoor2, index), 0);
+	}
+	else {
+		 c = UNITY_SAMPLE_TEX2DARRAY_LOD(_PlanetHeightMapBottom, float3(uCoor2, vCoor2, index), 0);
+	}
+	float3 worldPosition = (position.xyz + n * c.xyz * _PlanetInfo.y);
+
 
 	return worldPosition;
 }

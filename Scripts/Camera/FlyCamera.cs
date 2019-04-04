@@ -1,96 +1,84 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class FlyCamera : MonoBehaviour
+public class FlyCamera
 {
 
-    /*
-    Writen by Windexglow 11-13-10.  Use it, edit it, steal it I don't care.  
-    Converted to C# 27-02-13 - no credit wanted.
-    Simple flycam I made, since I couldn't find any others made public.  
-    Made simple to use (drag and drop, done) for regular keyboard layout  
-    wasd : basic movement
-    shift : Makes camera accelerate
-    space : Moves camera on X and Z axis only.  So camera doesn't gain any height*/
+    private float cameraSensitivity = 60;
+    private float climbSpeed = 4;
+    private float normalMoveSpeed = 10;
+    private float slowMoveFactor = 0.25f;
+    private float fastMoveFactor = 3;
+
+    private float minSpeed = 50;
+    private float maxSpeed ;
 
 
-    float mainSpeed = 500.0f; //regular speed
-    float shiftAdd = 2500.0f; //multiplied by how long shift is held.  Basically running
-    float maxShift = 15000.0f; //Maximum speed when holdin gshift
-    float camSens = 0.25f; //How sensitive it with mouse
-    private Vector3 lastMouse = new Vector3(255, 255, 255); //kind of in the middle of the screen, rather than at the top (play)
-    private float totalRun = 1.0f;
+    private float planerRadius;
 
-    void Update()
+    private Camera camera;
+    private float rotationX = 0.0f;
+    private float rotationY = 0.0f;
+
+    public FlyCamera(Camera camera, float planerRadius)
     {
-        lastMouse = Input.mousePosition - lastMouse;
-        lastMouse = new Vector3(-lastMouse.y * camSens, lastMouse.x * camSens, 0);
-        lastMouse = new Vector3(transform.eulerAngles.x + lastMouse.x, transform.eulerAngles.y + lastMouse.y, 0);
-        transform.eulerAngles = lastMouse;
-        lastMouse = Input.mousePosition;
-        //Mouse  camera angle done.  
+        Screen.lockCursor = true;
+        this.camera = camera;
+        this.planerRadius = planerRadius;
+        maxSpeed = planerRadius * 0.5f;
+    }
 
-        //Keyboard commands
-        float f = 0.0f;
-        Vector3 p = GetBaseInput();
-        if (Input.GetKey(KeyCode.LeftShift))
+    private void SetSpeedByDistance()
+    {
+        float cameraDistanc = Vector3.Distance(camera.transform.position, new Vector3(0, 0, 0));
+       
+        cameraDistanc = cameraDistanc - planerRadius;
+        if (cameraDistanc > planerRadius)
         {
-            totalRun += Time.deltaTime;
-            p = p * totalRun * shiftAdd;
-            p.x = Mathf.Clamp(p.x, -maxShift, maxShift);
-            p.y = Mathf.Clamp(p.y, -maxShift, maxShift);
-            p.z = Mathf.Clamp(p.z, -maxShift, maxShift);
+            normalMoveSpeed = maxSpeed;
+        }
+        else {
+            normalMoveSpeed = (cameraDistanc / planerRadius) * maxSpeed;
+            if (normalMoveSpeed < minSpeed)
+            {
+                normalMoveSpeed = minSpeed;
+            }
+        }
+    }
+
+    public void Update()
+    {
+        SetSpeedByDistance();
+        rotationX += Input.GetAxis("Mouse X") * cameraSensitivity * Time.deltaTime;
+        rotationY += Input.GetAxis("Mouse Y") * cameraSensitivity * Time.deltaTime;
+        rotationY = Mathf.Clamp(rotationY, -90, 90);
+
+        camera.transform.localRotation = Quaternion.AngleAxis(rotationX, Vector3.up);
+        camera.transform.localRotation *= Quaternion.AngleAxis(rotationY, Vector3.left);
+
+        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+        {
+            camera.transform.position += camera.transform.forward * (normalMoveSpeed * fastMoveFactor) * Input.GetAxis("Vertical") * Time.deltaTime;
+            camera.transform.position += camera.transform.right * (normalMoveSpeed * fastMoveFactor) * Input.GetAxis("Horizontal") * Time.deltaTime;
+        }
+        else if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        {
+            camera.transform.position += camera.transform.forward * (normalMoveSpeed * slowMoveFactor) * Input.GetAxis("Vertical") * Time.deltaTime;
+            camera.transform.position += camera.transform.right * (normalMoveSpeed * slowMoveFactor) * Input.GetAxis("Horizontal") * Time.deltaTime;
         }
         else
         {
-            totalRun = Mathf.Clamp(totalRun * 0.5f, 1f, 1000f);
-            p = p * mainSpeed;
+            camera.transform.position += camera.transform.forward * normalMoveSpeed * Input.GetAxis("Vertical") * Time.deltaTime;
+            camera.transform.position += camera.transform.right * normalMoveSpeed * Input.GetAxis("Horizontal") * Time.deltaTime;
         }
 
-        p = p * Time.deltaTime;
-        Vector3 newPosition = transform.position;
-        if (Input.GetKey(KeyCode.Space))
-        { //If player wants to move on X and Z axis only
-            transform.Translate(p);
-            newPosition.x = transform.position.x;
-            newPosition.z = transform.position.z;
-            transform.position = newPosition;
-        }
-        else
+
+        if (Input.GetKey(KeyCode.Q)) { camera.transform.position += camera.transform.up * climbSpeed * Time.deltaTime; }
+        if (Input.GetKey(KeyCode.E)) { camera.transform.position -= camera.transform.up * climbSpeed * Time.deltaTime; }
+
+        if (Input.GetKeyDown(KeyCode.End))
         {
-            transform.Translate(p);
+            Screen.lockCursor = (Screen.lockCursor == false) ? true : false;
         }
-
     }
-
-    private Vector3 GetBaseInput()
-    { //returns the basic values, if it's 0 than it's not active.
-        Vector3 p_Velocity = new Vector3();
-        if (Input.GetKey(KeyCode.W))
-        {
-            p_Velocity += new Vector3(0, 0, 1);
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            p_Velocity += new Vector3(0, 0, -1);
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            p_Velocity += new Vector3(-1, 0, 0);
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            p_Velocity += new Vector3(1, 0, 0);
-        }
-        return p_Velocity;
-    }
-
-   /* void OnPreRender()
-    {
-        GL.wireframe = true;
-    }
-    void OnPostRender()
-    {
-        GL.wireframe = false;
-    }*/
 }

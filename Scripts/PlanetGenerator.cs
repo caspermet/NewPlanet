@@ -8,6 +8,7 @@ public class PlanetGenerator : MonoBehaviour
     public Transform viewer;
     public Material instanceMaterial;
     public Camera camera;
+    CameraEdit cameraEditor;
 
     public float maxScale;
 
@@ -20,7 +21,12 @@ public class PlanetGenerator : MonoBehaviour
     private Vector3 planetInfo;
 
     public Texture2D[] planetTexture;
-    public Texture2D[] planetMapTexture;
+
+    public Texture2D[] planetMapTextureTop;
+    public Texture2D[] planetMapTextureBottom;
+
+    public Texture2D[] planetHeightMapTop;
+    public Texture2D[] planetHeightMapBottom;
 
     public Material atmosphereMaterial;
 
@@ -31,24 +37,24 @@ public class PlanetGenerator : MonoBehaviour
 
     void Start()
     {
-        Debug.Log(camera.fieldOfView);
-        Debug.Log(camera.nearClipPlane);
-        // planetInfo.x = (chunkSize - 1) * maxScale / 2;
+      
         planetInfo.x = maxScale / 2;
         planetInfo.y = maxTerrainHeight;
 
-        instanceMaterial.SetTexture("_Textures", LoadArrayTexture.DoTexture(planetTexture));
-        instanceMaterial.SetTexture("_PlanetTextures", LoadArrayTexture.DoTexture(planetMapTexture));
-
+        Debug.Log("top");
+       // instanceMaterial.SetTexture("_Textures", LoadArrayTexture.DoTexture(planetTexture));
+        instanceMaterial.SetTexture("_PlanetTexturesTop", LoadArrayTexture.DoTexture(planetMapTextureTop));
+        instanceMaterial.SetTexture("_PlanetTexturesBottom", LoadArrayTexture.DoTexture(planetMapTextureBottom));
+        instanceMaterial.SetTexture("_PlanetHeightMapTop", LoadArrayTexture.DoTexture(planetHeightMapTop));
+        instanceMaterial.SetTexture("_PlanetHeightMapBottom", LoadArrayTexture.DoTexture(planetHeightMapBottom));
         instanceMaterial.SetInt("_TexturesArrayLength", planetTextureRange.Length);
         instanceMaterial.SetFloatArray("_TexturesArray", planetTextureRange);
         instanceMaterial.SetVector("_PlanetInfo", planetInfo);
 
-      //  createSpehere();
-       // Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
-    //    Debug.Log(planes[2]);
+        cameraEditor = new CameraEdit(camera, maxScale / 2);
+        createSpehere();
 
-        chunk = new Chunk(maxScale, chunkSize, instanceMaterial, viewer);
+        chunk = new Chunk(maxScale, chunkSize, instanceMaterial, camera);
     }
 
     void createSpehere()
@@ -64,8 +70,8 @@ public class PlanetGenerator : MonoBehaviour
    
         instanceMaterial.SetInt("_TexturesArrayLength", planetTextureRange.Length);
         instanceMaterial.SetFloatArray("_TexturesArray", planetTextureRange);
-
-      //  chunk.Update(instanceMaterial);
+        cameraEditor.cameraUpdate();
+        chunk.Update(instanceMaterial);
     }
 
     void OnDisable()

@@ -13,9 +13,9 @@ public class ChunkFace
 
     private Vector3 position;
     private Vector4 positionToDraw;
+    private Camera camera;
 
     private Bounds bounds;
-
     public bool generated;
 
     private List<Vector4> positionsList = new List<Vector4>();
@@ -24,7 +24,11 @@ public class ChunkFace
     private Vector3 directionX;
     private Vector3 directionY;
 
-    public ChunkFace(ChunkFace parent, Vector3 position, float scale, int chunkSize, Vector3 viewerPositon, Vector3 directionX, Vector3 directionY, float radius)
+    private Vector3 normal;
+
+    private bool isVisible;
+
+    public ChunkFace(ChunkFace parent, Vector3 position, float scale, int chunkSize, Camera viewer, Vector3 directionX, Vector3 directionY, float radius, bool isVisible)
     {
         this.parentChunk = parent;
         this.position = position;
@@ -34,15 +38,21 @@ public class ChunkFace
         this.directionX = directionX;
         this.directionY = directionY;
         this.radius += radius;
+        this.camera = viewer;
+
+        this.isVisible = isVisible;
 
         generated = true;
+        Vector3 newPosition = CalculePositionOfSphere();
 
-      //  bounds = new Bounds(CalculePositionOfSphere(), new Vector3(1, 0, 1) * chunkSize * scale);
-        bounds = new Bounds(CalculePositionOfSphere(), new Vector3(1, 0, 1) * scale);
+        normal = newPosition.normalized;
+        //  bounds = new Bounds(CalculePositionOfSphere(), new Vector3(1, 0, 1) * chunkSize * scale);
+        bounds = new Bounds(newPosition, newPosition.normalized * scale);
+
         positionToDraw = new Vector4((position.x), (position.y), (position.z), scale);
         // this.position.y += radius;
 
-        Update(viewerPositon);
+        Update(viewer.transform.position, isVisible);
     }
 
     private Vector3 CalculePositionOfSphere()
@@ -51,22 +61,26 @@ public class ChunkFace
         float y = position.y / radius;
         float z = position.z / radius;
 
-        float dx = x * Mathf.Sqrt(1.0f - (y * y * 0.5f) - (z * z * 0.5f) + (y * y * z * z  / 3.0f));
+        float dx = x * Mathf.Sqrt(1.0f - (y * y * 0.5f) - (z * z * 0.5f) + (y * y * z * z / 3.0f));
         float dy = y * Mathf.Sqrt(1.0f - (z * z * 0.5f) - (x * x * 0.5f) + (z * z * x * x / 3.0f));
         float dz = z * Mathf.Sqrt(1.0f - (x * x * 0.5f) - (y * y * 0.5f) + (x * x * y * y / 3.0f));
 
         return new Vector3(dx, dy, dz) * radius;
     }
 
-    public List<Vector4> Update(Vector3 viewerPositon)
+    public List<Vector4> Update(Vector3 viewerPositon, bool isStillVisible)
     {
+        if (isStillVisible)
+        {
+            isVisible = FrustumCulling.Frustum(camera, bounds.center, scale * 0.5f, normal);
+        }
         var dist = Vector3.Distance(viewerPositon, bounds.ClosestPoint(viewerPositon));
-      
+
         if (parentChunk != null)
         {
             var distParent = Vector3.Distance(viewerPositon, parentChunk.GetBounds().ClosestPoint(viewerPositon));
 
-            if (distParent / 2 > parentChunk.GetScale() )
+            if (distParent / 2 > parentChunk.GetScale())
             {
                 parentChunk.MergeChunk();
                 return positionsList;
@@ -77,11 +91,16 @@ public class ChunkFace
         {
             SubDivide(viewerPositon);
         }
-
+        else if (!isVisible)
+        {
+            positionsList.Clear();
+            directionList.Clear();
+        }
         else
         {
             float tessellation = CalculeTessellatio(dist);
             Vector4 newDirection = new Vector4(directionX.x, directionX.y, directionX.z, tessellation);
+
             positionsList.Clear();
             directionList.Clear();
             positionsList.Add(positionToDraw);
@@ -93,7 +112,7 @@ public class ChunkFace
 
     private float CalculeTessellatio(float distance)
     {
-        return (distance * 100)/(4 * scale - scale) * 2 + 1;
+        return (distance * 100) / (4 * scale - scale) * 2 + 1;
     }
 
     public ChunkFace[] getChunkTree()
@@ -157,28 +176,39 @@ public class ChunkFace
 
     public void SubDivide(Vector3 viewerPosition)
     {
-        float newScale = scale * 0.5f;
+       
+        if (chunkTree != null)
+        {
+            foreach (var item in chunkTree)
+            {
+                item.Update(viewerPosition, isVisible);
+            }
+        }
+        else
+        {
+            float newScale = scale * 0.5f;
 
-        //Vector3 left = (directionX * scale * chunkSize / 4);
-        Vector3 left = (directionX * scale / 4);
-        //Vector3 forward = (directionY * scale * chunkSize / 4);
-        Vector3 forward = (directionY * scale / 4);
-        
+            Vector3 left = (directionX * scale / 4);
+            Vector3 forward = (directionY * scale / 4);
+
+            chunkTree = new ChunkFace[] {
+                new ChunkFace(this, position - left + forward,  newScale, chunkSize, camera, directionX, directionY, radius, isVisible),
+                new ChunkFace(this, position + left + forward,  newScale, chunkSize, camera, directionX, directionY, radius, isVisible),
+                new ChunkFace(this, position - left - forward,  newScale, chunkSize, camera, directionX, directionY, radius, isVisible),
+                new ChunkFace(this, position + left - forward,  newScale, chunkSize, camera, directionX, directionY, radius, isVisible)
+            };
 
 
-        chunkTree = new ChunkFace[] {
-                new ChunkFace(this, position - left + forward,  newScale, chunkSize, viewerPosition, directionX, directionY, radius),
-                new ChunkFace(this, position + left + forward,  newScale, chunkSize, viewerPosition, directionX, directionY, radius),
-                new ChunkFace(this, position - left - forward,  newScale, chunkSize, viewerPosition, directionX, directionY, radius),
-                new ChunkFace(this, position + left - forward,  newScale, chunkSize, viewerPosition, directionX, directionY, radius)
-        };
-
+        }
         positionsList.Clear();
         directionList.Clear();
-        foreach (var chunk in chunkTree)
+        if (isVisible)
         {
-            positionsList.AddRange(chunk.GetPositionList());
-            directionList.AddRange(chunk.GetDirectionList());
+            foreach (var chunk in chunkTree)
+            {
+                positionsList.AddRange(chunk.GetPositionList());
+                directionList.AddRange(chunk.GetDirectionList());
+            }
         }
     }
 

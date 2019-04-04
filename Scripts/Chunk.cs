@@ -25,7 +25,10 @@ public class Chunk
 
     private static Vector3 viewerPosition;
     private static Vector3 viewerPositionOld;
+    private static Vector3 viewerRotation;
+    private static Vector3 viewerRotationOld;
     private Transform viewer;
+    Camera camera;
 
     private ChunkFace[] chunkFace;
 
@@ -41,7 +44,7 @@ public class Chunk
 
     int cubeSize = 6;
 
-    public Chunk(float scale, int chunkSize, Material instanceMaterial, Transform viewer)
+    public Chunk(float scale, int chunkSize, Material instanceMaterial, Camera viewer)
     {
      //   planetRadius = (chunkSize - 1) * scale / 2;
         planetRadius = scale / 2;
@@ -51,17 +54,18 @@ public class Chunk
         planetRadiusArray = new Vector3[] { new Vector3(0, 0, planetRadius), new Vector3(0, 0, -planetRadius), new Vector3(planetRadius, 0, 0), new Vector3(-planetRadius, 0, 0), new Vector3(0, planetRadius, 0), new Vector3(0, -planetRadius, 0) };
        
         this.scale = scale;
-        this.viewer = viewer;
+        this.viewer = viewer.transform;
         this.chunkSize = chunkSize;
+        this.camera = viewer;
 
-        viewerPosition = viewer.position;
+        viewerPosition = this.viewer.position;
         chunkFace = new ChunkFace[6];
-        Thread[] objThread = new Thread[cubeSize];
+    //    Thread[] objThread = new Thread[cubeSize];
 
         //Vytvoreni vlaken pro vytvoreni cube
         for (int index = 0; index < 6; index++)
         {
-            chunkThreade(index);
+            chunkFace[index] = new ChunkFace(null, planetRadiusArray[index], this.scale, (chunkSize - 1), camera, directions[index], directionsY[index], planetRadius, true);
         }
 
         meshData = MeshGenerator.GenerateTerrainMesh(chunkSize, (int)scale);
@@ -78,7 +82,10 @@ public class Chunk
         viewedChunkCoord = positionsList.ToArray();
         directionArray = directionList.ToArray();
 
-        drawMesh.UpdateData(positionsList.Count, viewedChunkCoord, directionArray) ;
+        if (positionsList.Count > 0)
+        {
+            drawMesh.UpdateData(positionsList.Count, viewedChunkCoord, directionArray);
+        }
         
 
     }
@@ -90,7 +97,7 @@ public class Chunk
         {
             Thread.CurrentThread.IsBackground = true;
             ChunkFace chunkFaceInThreade;
-            chunkFaceInThreade = new ChunkFace(null, planetRadiusArray[index], this.scale, (chunkSize - 1), viewerPosition, directions[index], directionsY[index], planetRadius);
+            chunkFaceInThreade = new ChunkFace(null, planetRadiusArray[index], this.scale, (chunkSize - 1), camera, directions[index], directionsY[index], planetRadius, true);
 
             lock (chunkFaceLock)
             {
@@ -104,10 +111,12 @@ public class Chunk
     public void Update(Material instanceMaterial)
     {
         viewerPosition = new Vector3(viewer.position.x, viewer.position.y, viewer.position.z);
+        viewerRotation = new Vector3(viewer.eulerAngles.x, viewer.eulerAngles.y, viewer.eulerAngles.z);
 
-        if (viewerPositionOld != viewerPosition)
+        if (viewerPositionOld != viewerPosition || viewerRotation != viewerRotationOld)
         {
             viewerPositionOld = viewerPosition;
+            viewerRotationOld = viewerRotation;
 
             UpdateChunkMesh();
             viewedChunkCoord = positionsList.ToArray();
@@ -116,7 +125,7 @@ public class Chunk
 
         if (positionsList.Count > 0)
         {
-           // drawMesh.UpdateData(positionsList.Count, viewedChunkCoord, directionArray);
+            drawMesh.UpdateData(positionsList.Count, viewedChunkCoord, directionArray);
             drawMesh.Draw();
         }
     }
@@ -129,7 +138,7 @@ public class Chunk
 
         for (int i = 0; i < cubeSize; i++)
         {
-            positionsList.AddRange(chunkFace[i].Update(viewerPosition));
+            positionsList.AddRange(chunkFace[i].Update(viewerPosition, true));
             directionList.AddRange(chunkFace[i].GetDirectionList());          
         }
 
@@ -138,7 +147,6 @@ public class Chunk
 
         if (viewedChunkCoord.Length > 0)
         {
-
             drawMesh.UpdateData(positionsList.Count, viewedChunkCoord, directionArray);
         }
     }
@@ -149,7 +157,7 @@ public class Chunk
         {
             List<Vector4> listOfPosition;
             List<Vector4> listOfDirection;
-            listOfPosition = chunkFace[index].Update(viewerPosition);
+            listOfPosition = chunkFace[index].Update(viewerPosition, true);
             listOfDirection = chunkFace[index].GetDirectionList();
 
             lock (chunkUpdateLock)

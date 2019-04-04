@@ -4,7 +4,10 @@
 	{
 		_MainTex("Albedo (RGB)", 2D) = "white" {}
 		_HeightTex("HeighMap", 2D) = "white" {}
-		_PlanetTextures("Textures", 2DArray) = "" {}
+		_PlanetTexturesTop("Textures", 2DArray) = "" {}
+		_PlanetTexturesBottom("Textures", 2DArray) = "" {}
+		_PlanetHeightMapTop("Textures", 2DArray) = "" {}
+		_PlanetHeightMapBottom("Textures", 2DArray) = "" {}
 		_Tess("Tessellation", Range(1,32)) = 4
 		_DiffuseColor("Diffuse Color", color) = (0.5,0.5,0.5,0.5)
 	}
