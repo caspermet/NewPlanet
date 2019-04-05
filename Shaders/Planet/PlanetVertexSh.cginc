@@ -39,6 +39,7 @@ float3 CalcUVFromHM(float3 position) {
 	float3 worldPosition;
 	float4 noiseValue = float4(0,0,0,0);
 
+
 	float dist = (distance(float3(0,0,0),  _CameraPosition)) - _PlanetInfo.x;
 	if (dist > _PlanetInfo.x * 0.5) {
 		worldPosition = (position.xyz + n * (tex2Dlod(_HeightTex, float4(uCoor, vCoor, 0.0, 0)) * _PlanetInfo.y));
@@ -64,7 +65,7 @@ float3 CalcUVFromHM(float3 position) {
 			c = UNITY_SAMPLE_TEX2DARRAY_LOD(_PlanetHeightMapBottom, float3(uCoor2, vCoor2, index), 0);
 		}
 
-		if (dist < 400 && _FlipNoise == 1) {
+		if (_FlipNoise == 1 && c.y > _noiseHeight) {
 			noiseValue = tex2Dlod(_noiseTexture, float4(uCoor * _Tesss, vCoor * _Tesss, 0.0, 0)) * _Tess;
 		}
 	
@@ -110,15 +111,16 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	float dz = z * sqrt(1.0f - (x*x * 0.5f) - (y * y * 0.5f) + (x*x*y*y / 3.0f));
 
 	worldPosition.xyz = float3(dx, dy, dz) * _PlanetInfo.x;;
+	o.normal = normalize(worldPosition.xyz);
 
 	worldPosition.xyz = CalcUVFromHM(worldPosition);
 
 	o.wordPosition = mul(UNITY_MATRIX_MV, float4(worldPosition, 1.0f));
 	o.wordPosition = float4(worldPosition, 1.0f);
 	o.vertex = float4(worldPosition, 1.0f);
-	o.normal = v.normal;
 	o.uv = v.uv;
 	o.tess = transform.w;
+	
 	return o;
 
 }

@@ -73,6 +73,7 @@ DS_OUTPUT DS(HS_CONSTANT_OUTPUT input, OutputPatch<HS_OUTPUT, 3> ip, float3 b : 
 	o.vertex = ip[0].vertex*b.x + ip[1].vertex*b.y + ip[2].vertex*b.z;
 	o.uv = ip[0].uv*b.x + ip[1].uv*b.y + ip[2].uv*b.z;
 	o.wordPosition = ip[0].wordPosition*b.x + ip[1].wordPosition*b.y + ip[2].wordPosition*b.z;
+	o.normal = ip[0].normal*b.x + ip[1].normal*b.y + ip[2].normal*b.z;
 	o.vertex = UnityObjectToClipPos(o.vertex);
 	return o;
 }

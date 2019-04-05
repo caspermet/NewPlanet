@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Atmosphere
-  m_Shader: {fileID: 4800000, guid: e19c1720a60bca043a3d387c2164c2dd, type: 3}
+  m_Name: light
+  m_Shader: {fileID: 4800000, guid: 46217758146d2424ab47ad96856b7b58, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -59,8 +59,6 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _Falloff: 4.6
-    - _FalloffPlanet: 100
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -68,15 +66,15 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _Size: 0.06
+    - _RimPower: 0.9
+    - _Shininess: 5.2
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _Transparency: 15.71
-    - _TransparencyPlanet: 0
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _AtmoColor: {r: 0.5, g: 0.5, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _RimColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SpecColor: {r: 1, g: 1, b: 1, a: 1}

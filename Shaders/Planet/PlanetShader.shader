@@ -8,11 +8,21 @@
 		_PlanetTexturesBottom("Textures", 2DArray) = "" {}
 		_PlanetHeightMapTop("Textures", 2DArray) = "" {}
 		_PlanetHeightMapBottom("Textures", 2DArray) = "" {}
+		_noiseHeight("minheightNOise", Range(0,1)) = 0
+		_textureProfil("texture", int) = 0
 		_Tess("Tessellation", Range(0,2)) = 4
 		_Tesss("tttt", Range(0,512)) = 4
 		_DiffuseColor("Diffuse Color", color) = (0.5,0.5,0.5,0.5)
 
 		[MaterialToggle] _FlipNoise("NoiseMap", Float) = 0
+
+
+
+		_Color("Color", Color) = (1.0,1.0,1.0,1.0)
+		_SpecColor("specular color", Color) = (1.0,1.0,1.0,1.0)
+		_Shininess("Shiniess", float) = 10
+		_RimColor("Rim color", Color) = (1.0,1.0,1.0,1.0)
+		_RimPower("Rim Power", Range(0.1,10.0)) = 3.0
 	}
 		SubShader
 	{
@@ -39,6 +49,21 @@
 		sampler2D _MainTex;
 		sampler2D _HeightTex;
 		float _FlipNoise;
+		float _noiseHeight;
+		int _textureProfil;
+
+
+		/*********************
+		light
+		*/
+
+		uniform float4 _Color;
+		uniform float4 _SpecColor;
+		uniform float4 _RimColor;
+		uniform float _Shininess;
+		uniform float _RimPower;
+
+		uniform float4 _LightColor0;
 
 		//#pragma multi_compile_fwdbase
 
