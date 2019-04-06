@@ -32,6 +32,8 @@ public class PlanetGenerator : MonoBehaviour
 
     public Material atmosphereMaterial;
 
+    private float gamma = 1.0f;
+    public float hdrExposure = 1.0f;
 
     [Range(0, 1)]
     public float[] planetTextureRange;
@@ -67,6 +69,8 @@ public class PlanetGenerator : MonoBehaviour
         instanceMaterial.SetFloatArray("_TexturesArray", planetTextureRange);
         instanceMaterial.SetVector("_CameraPosition", camera.transform.position);
         instanceMaterial.SetVector("_PlanetInfo", planetInfo);
+        instanceMaterial.SetFloat("_Gamma", gamma);
+        instanceMaterial.SetFloat("fHdrExposure", hdrExposure);
     }
 
     void CreateSpehere()

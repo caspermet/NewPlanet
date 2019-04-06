@@ -31,46 +31,43 @@ struct VS_OUTPUT
 StructuredBuffer<float4> positionBuffer;
 StructuredBuffer<float4> directionsBuffer;
 
+/*******************
+	Calcule height value from heighMap
+*/
+float3 CalcUVFromHM(float3 position, float2 uvCoor, float3 normPosition) {
 
-float3 CalcUVFromHM(float3 position) {
-	float3 n = normalize(float3(position.x, position.y, position.z));
-	float uCoor = atan2(n.z, n.x) / (2 * PI) + 0.5f;
-	float vCoor = asin(n.y) / PI + 0.5f;
 	float3 worldPosition;
 	float4 noiseValue = float4(0,0,0,0);
 
-
 	float dist = (distance(float3(0,0,0),  _CameraPosition)) - _PlanetInfo.x;
 	if (dist > _PlanetInfo.x * 0.5) {
-		worldPosition = (position.xyz + n * (tex2Dlod(_HeightTex, float4(uCoor, vCoor, 0.0, 0)) * _PlanetInfo.y));
+		worldPosition = (position.xyz + normPosition * (tex2Dlod(_HeightTex, float4(uvCoor, 0.0, 0)) * _PlanetInfo.y));
 	}
 	else {
-		float uMap = uCoor * 4;
-		int vMap = vCoor >= 0.5f ? 1 : 2;
+		float uMap = uvCoor.x * 4;
+		int vMap = uvCoor.y > 0.5f ? 1 : 2;
 
 		int xindex = int(uMap);
 
-		int index = xindex + (vCoor >= 0.5f ? 0 : 4);
+		int index = xindex + (uvCoor.y >= 0.5f ? 0 : 4);
 
-		float uCoor2 = (uCoor * 4 - (float(xindex)));
-		float vCoor2 = (vCoor - float(vMap) * 0.5f) * 2;
+		float uCoor2 = (uvCoor.x * 4 - (float(xindex)));
+		float vCoor2 = (uvCoor.y - float(vMap) * 0.5f) * 2;  
 
-		//float3 worldPosition = (position.xyz + n * (tex2Dlod(_HeightTex, float4(uCoor, vCoor, 0.0, 0)) * _PlanetInfo.y));
 		float4 c;
-		if (vCoor >= 0.5f) {
+		if (uvCoor.y > 0.5f) {
 			c = UNITY_SAMPLE_TEX2DARRAY_LOD(_PlanetHeightMapTop, float3(uCoor2, vCoor2, index), 0);
 		}
-		else {
-			//c = float3(1, 1, 1);
+		else {		
 			c = UNITY_SAMPLE_TEX2DARRAY_LOD(_PlanetHeightMapBottom, float3(uCoor2, vCoor2, index), 0);
 		}
 
 		if (_FlipNoise == 1 && c.y > _noiseHeight) {
-			noiseValue = tex2Dlod(_noiseTexture, float4(uCoor * _Tesss, vCoor * _Tesss, 0.0, 0)) * _Tess;
+			noiseValue = tex2Dlod(_noiseTexture, float4(uvCoor.x * _Tesss, uvCoor.y * _Tesss, 0.0, 0)) * _Tess;
 		}
 	
 
-		worldPosition = (position.xyz + n * (c.xyz + noiseValue.xyz) * _PlanetInfo.y);
+		worldPosition = (position.xyz + normPosition * (c.xyz + noiseValue.xyz) * _PlanetInfo.y);
 	}
 
 	return worldPosition;
@@ -109,16 +106,21 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	float dx = x * sqrt(1.0f - (y*y * 0.5f) - (z * z * 0.5f) + (y*y*z*z / 3.0f));
 	float dy = y * sqrt(1.0f - (z*z * 0.5f) - (x * x * 0.5f) + (z*z*x*x / 3.0f));
 	float dz = z * sqrt(1.0f - (x*x * 0.5f) - (y * y * 0.5f) + (x*x*y*y / 3.0f));
+	o.normal = float3(dx, dy, dz);
 
-	worldPosition.xyz = float3(dx, dy, dz) * _PlanetInfo.x;;
-	o.normal = normalize(worldPosition.xyz);
+	worldPosition.xyz = float3(dx, dy, dz) * _PlanetInfo.x;
 
-	worldPosition.xyz = CalcUVFromHM(worldPosition);
+	//calcule UV of heightMap
+	float3 n = normalize(float3(worldPosition.x, worldPosition.y, worldPosition.z));
+	float uCoor = atan2(n.z, n.x) / (2 * PI) + 0.5f;
+	float vCoor = asin(n.y) / PI + 0.5f; 
+
+	worldPosition.xyz = CalcUVFromHM(worldPosition, float2(uCoor, vCoor), n);
 
 	o.wordPosition = mul(UNITY_MATRIX_MV, float4(worldPosition, 1.0f));
 	o.wordPosition = float4(worldPosition, 1.0f);
 	o.vertex = float4(worldPosition, 1.0f);
-	o.uv = v.uv;
+	o.uv = float2(uCoor, vCoor);
 	o.tess = transform.w;
 	
 	return o;

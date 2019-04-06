@@ -2,21 +2,28 @@ UNITY_DECLARE_TEX2DARRAY(_PlanetTexturesTop);
 UNITY_DECLARE_TEX2DARRAY(_PlanetTexturesBottom);
 UNITY_DECLARE_TEX2DARRAY(_SurfaceTexture);
 
+float3 calcColor2(DS_OUTPUT input, float3 textureColor) {
 
-float3 calcColor(DS_OUTPUT i) {
-	float3 normalDirection = i.normal;
-	float3 viewDirection = normalize(_WorldSpaceCameraPos.xyz - i.wordPosition.xyz);
-	float lightDirection = normalize(_WorldSpaceLightPos0.xyz);
-	float atten = 1.0;
+	float3 normalDirection = input.normal;
 
-	float3 diffuseReflection = atten * _LightColor0.xyz * saturate(dot(normalDirection, lightDirection));
-	float3 specularReflection = atten * _LightColor0.xyz * saturate(dot(normalDirection, lightDirection)) * pow(saturate(dot(reflect(-lightDirection, normalDirection), viewDirection)), _Shininess);
+	float3 viewDirection = normalize(_WorldSpaceCameraPos - input.wordPosition.xyz);
+	float3 lightDirection = normalize(_WorldSpaceLightPos0.xyz);
 
-	float rim = 1 - saturate(dot(normalize(viewDirection), normalDirection));
-	float rimLighting = atten * _LightColor0.xyz  * _RimColor * saturate(dot(normalDirection, lightDirection)) * pow(rim, _RimPower);
-	float3 lightFinal = rimLighting + diffuseReflection + specularReflection +UNITY_LIGHTMODEL_AMBIENT.rgb;
+	float3 diff = _LightColor0.rgb * max(0, dot(lightDirection, normalize(normalDirection + (0.2 * lightDirection))));
+	float3 spec = _SpecColor.rgb * pow(max(0, dot(reflect(-lightDirection, normalDirection), viewDirection)), _Shininess);
 
-	return float3(lightFinal);
+	// DIFFUSE + NORMAL
+
+	float3 c = diff * pow(textureColor, _Gamma);
+	// SPECULAR
+	c += spec * diff * pow(tex2D(_SpecMap, input.uv.xy).r, _Gamma);
+
+	// EXPOSURE
+	c = 1.0 - exp(c * -fHdrExposure);
+	// GAMMA CORRECTION
+	c = pow(c, 1 / _Gamma);
+
+	return c;
 }
 
 fixed4 FS(DS_OUTPUT i) : SV_Target
@@ -35,7 +42,7 @@ fixed4 FS(DS_OUTPUT i) : SV_Target
 
 	else {
 		float uMap = uCoor * 4;
-		int vMap = vCoor >= 0.5f ? 1 : 2;
+		int vMap = vCoor > 0.5f ? 1 : 2;
 
 		 xindex = int(uMap);
 
@@ -45,14 +52,14 @@ fixed4 FS(DS_OUTPUT i) : SV_Target
 		uCoor2 = (uCoor * 4 - (float(xindex)));
 		float vCoor2 = (vCoor - float(vMap) * 0.5f) * 2;
 		
-		/*if (vCoor >= 0.5f) {
+		if (vCoor > 0.5f) {
 			c = UNITY_SAMPLE_TEX2DARRAY(_PlanetTexturesTop, float3(float2(uCoor2, vCoor2), xindex));
 		}
 		else {
 			c = UNITY_SAMPLE_TEX2DARRAY(_PlanetTexturesBottom, float3(float2(uCoor2, vCoor2), xindex));
-		}*/
+		}
 
-		c = tex2Dlod(_MainTex, float4(uCoor, vCoor, 0.0, 0));
+		//c = tex2Dlod(_MainTex, float4(uCoor, vCoor, 0.0, 0));
 
 	
 		if (dist < float(_PlanetInfo.x)  * 0.2) {
@@ -69,7 +76,7 @@ fixed4 FS(DS_OUTPUT i) : SV_Target
 
 	}
 
+	float3 calc = calcColor2(i, c.xyz);
 
-
-	return float4(calcColor(i).xyz * c.xyz, 1.0);
+	return float4(calc, 1.0);
 }

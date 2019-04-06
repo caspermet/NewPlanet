@@ -18,13 +18,11 @@
 
 
 
-		_Color("Color", Color) = (1.0,1.0,1.0,1.0)
-		_SpecColor("specular color", Color) = (1.0,1.0,1.0,1.0)
-		_Shininess("Shiniess", float) = 10
-		_RimColor("Rim color", Color) = (1.0,1.0,1.0,1.0)
-		_RimPower("Rim Power", Range(0.1,10.0)) = 3.0
+		_Shininess("Shininess", Range(1, 50)) = 20
+		_SpecColor("Specular Color", Color) = (1,1,1,1)
+		_SpecMap("Specular Map", 2D) = "white" {}
 	}
-		SubShader
+		SubShader 
 	{
 		Tags { "RenderType" = "Opaque"  }
 		LOD 200
@@ -56,14 +54,14 @@
 		/*********************
 		light
 		*/
-
-		uniform float4 _Color;
-		uniform float4 _SpecColor;
-		uniform float4 _RimColor;
-		uniform float _Shininess;
-		uniform float _RimPower;
-
+	
 		uniform float4 _LightColor0;
+		uniform float _Shininess;
+		uniform float4 _SpecColor;
+		uniform sampler2D _SpecMap;
+
+		float fHdrExposure;
+		float _Gamma;
 
 		//#pragma multi_compile_fwdbase
 
