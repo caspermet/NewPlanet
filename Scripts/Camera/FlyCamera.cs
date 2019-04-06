@@ -11,7 +11,9 @@ public class FlyCamera
     private float fastMoveFactor = 3;
 
     private float minSpeed = 5;
-    private float maxSpeed ;
+    private float maxSpeed;
+
+    private float rotationSpeed = 120.0f;
 
 
     private float planerRadius;
@@ -19,6 +21,14 @@ public class FlyCamera
     private Camera camera;
     private float rotationX = 0.0f;
     private float rotationY = 0.0f;
+
+    /************************************
+     * sun rotate
+     * */
+
+    private Transform sun;
+    public float sunRotSpeed = 1.0f;
+
 
     public FlyCamera(Camera camera, float planerRadius)
     {
@@ -49,12 +59,17 @@ public class FlyCamera
     public void Update()
     {
         SetSpeedByDistance();
-        rotationX += Input.GetAxis("Mouse X") * cameraSensitivity * Time.deltaTime;
-        rotationY += Input.GetAxis("Mouse Y") * cameraSensitivity * Time.deltaTime;
-        //rotationY = Mathf.Clamp(rotationY, -180, 180);
 
-        camera.transform.localRotation = Quaternion.AngleAxis(rotationX, Vector3.up);
-        camera.transform.localRotation *= Quaternion.AngleAxis(rotationY, Vector3.left);
+        Vector2 mouse = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+        mouse = Vector2.Scale(mouse, new Vector2(cameraSensitivity, cameraSensitivity));
+
+        camera.transform.Rotate(-Vector3.right * mouse.y * Time.deltaTime);
+        camera.transform.Rotate(Vector3.up * mouse.x * Time.deltaTime);
+
+        if (Input.GetKey(KeyCode.Q))
+            camera.transform.Rotate(Vector3.forward, rotationSpeed * Time.deltaTime);
+        else if (Input.GetKey(KeyCode.E))
+            camera.transform.Rotate(Vector3.forward, -rotationSpeed * Time.deltaTime);
 
         if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
         {
@@ -72,9 +87,12 @@ public class FlyCamera
             camera.transform.position += camera.transform.right * normalMoveSpeed * Input.GetAxis("Horizontal") * Time.deltaTime;
         }
 
+        if (Input.GetKey(KeyCode.Z))
+            sun.Rotate(new Vector3(0, sunRotSpeed * Time.deltaTime, 0));
+        else if (Input.GetKey(KeyCode.C))
+            sun.Rotate(new Vector3(0, -sunRotSpeed * Time.deltaTime, 0));
 
-        if (Input.GetKey(KeyCode.Q)) { camera.transform.position += camera.transform.up * climbSpeed * Time.deltaTime; }
-        if (Input.GetKey(KeyCode.E)) { camera.transform.position -= camera.transform.up * climbSpeed * Time.deltaTime; }
+
 
         if (Input.GetKeyDown(KeyCode.End))
         {
