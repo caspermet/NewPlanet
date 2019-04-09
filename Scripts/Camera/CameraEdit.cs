@@ -36,5 +36,14 @@ public class CameraEdit
     {
         float farPlanedistance = Vector3.Distance(camera.transform.position, new Vector3(0, 0, 0));
         camera.farClipPlane = farPlanedistance;
+        if(distance < 100)
+        {
+            camera.nearClipPlane = 0.1f;
+        }
+        else
+        {
+            camera.nearClipPlane = 30;
+        }
+
     }
 }

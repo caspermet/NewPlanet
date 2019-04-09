@@ -1,35 +1,3 @@
-/*****************************************************************
-				Planet Info
-				x -> planet Radius -> (chunkSize - 1) * MaxScale
-				y -> Max terrain height
-		********************************************************************/
-float3 _PlanetInfo;
-float3 _CameraPosition;
-sampler2D _noiseTexture;
-
-UNITY_DECLARE_TEX2DARRAY(_PlanetHeightMapTop);
-UNITY_DECLARE_TEX2DARRAY(_PlanetHeightMapBottom);
-
-struct APP_OUTPUT
-{
-	float4 vertex : POSITION;
-	float3 normal : NORMAL;
-	float2 uv : TEXCOORD0;
-};
-
-
-struct VS_OUTPUT
-{
-	float4 vertex : INTERNALTESSPOS;
-	float3 normal : NORMAL;
-	float4 tangent : TANGENT;
-	float2 uv : TEXCOORD0;
-	float4 wordPosition : TEXCOORD1;
-	float tess : TEXCOORD2;
-};
-
-StructuredBuffer<float4> positionBuffer;
-StructuredBuffer<float4> directionsBuffer;
 
 /*******************
 	Calcule height value from heighMap
@@ -114,14 +82,29 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	float3 n = normalize(float3(worldPosition.x, worldPosition.y, worldPosition.z));
 	float uCoor = atan2(n.z, n.x) / (2 * PI) + 0.5f;
 	float vCoor = asin(n.y) / PI + 0.5f; 
+	float tessellation = transform.w * _TessMax;
 
-	worldPosition.xyz = CalcUVFromHM(worldPosition, float2(uCoor, vCoor), n);
+	/**************************
+	calcul if is water
+	*****************/
+	float specular = tex2Dlod(_SpecMap, float4(uCoor, vCoor, 0.0f, 0)).r;
+
+	if (tessellation < _TessMin) {
+		tessellation = _TessMin;
+	}
+
+	if (specular >= 0.5f) {
+		tessellation = 1;
+	}
+	else {
+		worldPosition.xyz = CalcUVFromHM(worldPosition, float2(uCoor, vCoor), n);
+	}
 
 	o.wordPosition = mul(UNITY_MATRIX_MV, float4(worldPosition, 1.0f));
 	o.wordPosition = float4(worldPosition, 1.0f);
 	o.vertex = float4(worldPosition, 1.0f);
 	o.uv = float2(uCoor, vCoor);
-	o.tess = transform.w;
+	o.tess = tessellation;
 	
 	return o;
 

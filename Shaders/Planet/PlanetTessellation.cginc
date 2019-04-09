@@ -1,28 +1,10 @@
-struct HS_OUTPUT
-{
-	float4 vertex : INTERNALTESSPOS;
-	float3 normal : NORMAL;
-	float4 tangent : TANGENT;
-	float2 uv : TEXCOORD0;
-	float4 wordPosition : TEXCOORD1;
-	float tess : TEXCOORD2;
-};
 
-struct DS_OUTPUT
-{
-	float4 vertex : POSITION;
-	float3 normal : NORMAL;
-	float4 tangent : TANGENT;
-	float2 uv : TEXCOORD0;
-	float4 wordPosition : TEXCOORD1;
-};
-/*
-float4 tessDistance(APP_OUTPUT v0, APP_OUTPUT v1, APP_OUTPUT v2) {
-	float minDist = 10.0;
-	float maxDist = 70.0;
-	return UnityDistanceBasedTess(v0.vertex, v1.vertex, v2.vertex, minDist, maxDist, _Tess);
+
+float4 tessDistance(APP_OUTPUT v0, APP_OUTPUT v1, APP_OUTPUT v2, float scale) {
+	float minDist = scale * 0.5;
+	float maxDist = scale * 2;
+	return UnityDistanceBasedTess(v0.vertex, v1.vertex, v2.vertex, minDist, maxDist, 2);
 }
-*/
 
 #ifdef UNITY_CAN_COMPILE_TESSELLATION
 struct HS_CONSTANT_OUTPUT
@@ -34,15 +16,11 @@ struct HS_CONSTANT_OUTPUT
 HS_CONSTANT_OUTPUT HSConst(InputPatch<VS_OUTPUT, 3> v)
 {
 	HS_CONSTANT_OUTPUT o;
-	float4 tf;
 
-/*	APP_OUTPUT vi[3];
-	vi[0].vertex = v[0].vertex;
-	vi[1].vertex = v[1].vertex;
-	vi[2].vertex = v[2].vertex;
-
-	tf = tessDistance(vi[0], vi[1], vi[2]);*/
-	o.edges[0] = 1; o.edges[1] = 1; o.edges[2] = 1; o.inside = 1;
+	o.edges[0] = v[0].tess;
+	o.edges[1] = v[0].tess;
+	o.edges[2] = v[0].tess;
+	o.inside   = v[0].tess;
 
 	return o;
 }
@@ -58,9 +36,9 @@ HS_OUTPUT HS(InputPatch<VS_OUTPUT, 3> ip, uint id : SV_OutputControlPointID)
 	HS_OUTPUT o;
 	o.vertex = ip[id].vertex;
 	o.normal = ip[id].normal;
-	o.tangent = ip[id].tangent;
 	o.uv = ip[id].uv;
 	o.wordPosition = ip[id].wordPosition;
+	o.tess = ip[id].tess;
 
 	return o;
 }

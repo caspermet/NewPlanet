@@ -54,7 +54,7 @@ public class PlanetGenerator : MonoBehaviour
         chunk = new Chunk(maxScale, chunkSize, instanceMaterial, camera);
     }
 
-
+    public Texture2D perlinNoise;
     void SetMaterialProperties()
     {
         instanceMaterial.SetTexture("_SurfaceTexture", LoadArrayTexture.DoTexture(planetTexture));
@@ -63,7 +63,7 @@ public class PlanetGenerator : MonoBehaviour
         instanceMaterial.SetTexture("_PlanetTexturesBottom", LoadArrayTexture.DoTexture(planetMapTextureBottom));
         instanceMaterial.SetTexture("_PlanetHeightMapTop", LoadArrayTexture.DoTexture(planetHeightMapTop));
         instanceMaterial.SetTexture("_PlanetHeightMapBottom", LoadArrayTexture.DoTexture(planetHeightMapBottom));
-        instanceMaterial.SetTexture("_noiseTexture", PerlingNoise.CreateNoise((int)width, noise));
+        instanceMaterial.SetTexture("_noiseTexture", perlinNoise = PerlingNoise.CreateNoise((int)width, noise));
 
         instanceMaterial.SetInt("_TexturesArrayLength", planetTextureRange.Length);
         instanceMaterial.SetFloatArray("_TexturesArray", planetTextureRange);

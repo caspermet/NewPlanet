@@ -41,8 +41,12 @@ public class Chunk
     static object chunkFaceLock = new object();
     static object chunkUpdateLock = new object();
 
+    private Mesh mesh;
+    private Mesh oneEdgeMesh;
+    private Mesh twoEdgeMesh;
+    private Mesh threeEdgeMesh;
 
-    int cubeSize = 6;
+    int cubeSize = 1;
 
     public Chunk(float scale, int chunkSize, Material instanceMaterial, Camera viewer)
     {
@@ -60,15 +64,13 @@ public class Chunk
 
         viewerPosition = this.viewer.position;
         chunkFace = new ChunkFace[6];
-    //    Thread[] objThread = new Thread[cubeSize];
 
-        //Vytvoreni vlaken pro vytvoreni cube
         for (int index = 0; index < 6; index++)
         {
-            chunkFace[index] = new ChunkFace(null, planetRadiusArray[index], this.scale, (chunkSize - 1), camera, directions[index], directionsY[index], planetRadius, true);
+            chunkFace[index] = new ChunkFace(null, planetRadiusArray[index], this.scale, camera, directions[index], directionsY[index], planetRadius, true, 0, "");
         }
 
-        meshData = MeshGenerator.GenerateTerrainMesh(chunkSize, (int)scale);
+        meshData = MeshGenerator.GenerateTerrainMeshThreeEdge(chunkSize, (int)scale);
         meshData.CreateMesh();
 
         drawMesh = new DrawMeshInstanced(meshData.GetMesh(), instanceMaterial);
@@ -90,6 +92,25 @@ public class Chunk
 
     }
 
+    private void createMashOfArray()
+    {
+        MeshData newMeshData = MeshGenerator.GenerateTerrainMeshTwoEdge(chunkSize, (int)scale);
+        meshData.CreateMesh();
+        mesh = meshData.GetMesh();
+
+        newMeshData = MeshGenerator.GenerateTerrainMeshRight(chunkSize, (int)scale);
+        meshData.CreateMesh();
+        oneEdgeMesh = meshData.GetMesh();
+
+        newMeshData = MeshGenerator.GenerateTerrainMeshTwoEdge(chunkSize, (int)scale);
+        meshData.CreateMesh();
+        twoEdgeMesh = meshData.GetMesh();
+
+        newMeshData = MeshGenerator.GenerateTerrainMeshThreeEdge(chunkSize, (int)scale);
+        meshData.CreateMesh();
+        threeEdgeMesh = meshData.GetMesh();
+    }
+
     private void chunkThreade(int index)
     {
 
@@ -97,7 +118,7 @@ public class Chunk
         {
             Thread.CurrentThread.IsBackground = true;
             ChunkFace chunkFaceInThreade;
-            chunkFaceInThreade = new ChunkFace(null, planetRadiusArray[index], this.scale, (chunkSize - 1), camera, directions[index], directionsY[index], planetRadius, true);
+            chunkFaceInThreade = new ChunkFace(null, planetRadiusArray[index], this.scale, camera, directions[index], directionsY[index], planetRadius, true, 0, "");
 
             lock (chunkFaceLock)
             {
@@ -142,7 +163,12 @@ public class Chunk
             directionList.AddRange(chunkFace[i].GetDirectionList());          
         }
 
-        viewedChunkCoord = positionsList.ToArray();
+        for (int i = 0; i < cubeSize; i++)
+        {
+            chunkFace[i].GetPosition2();
+        }
+
+            viewedChunkCoord = positionsList.ToArray();
         directionArray = directionList.ToArray();
 
         if (viewedChunkCoord.Length > 0)

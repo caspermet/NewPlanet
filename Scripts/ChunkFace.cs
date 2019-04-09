@@ -10,6 +10,7 @@ public class ChunkFace
     private int chunkSize;
     private float scale;
     private float radius;
+    private int level;
 
     private Vector3 position;
     private Vector4 positionToDraw;
@@ -28,17 +29,20 @@ public class ChunkFace
 
     private bool isVisible;
 
-    public ChunkFace(ChunkFace parent, Vector3 position, float scale, int chunkSize, Camera viewer, Vector3 directionX, Vector3 directionY, float radius, bool isVisible)
+    private string myDirection;
+
+    public ChunkFace(ChunkFace parent, Vector3 position, float scale, Camera viewer, Vector3 directionX, Vector3 directionY, float radius, bool isVisible, int level, string myDirection)
     {
         this.parentChunk = parent;
         this.position = position;
         this.scale = scale;
-        this.chunkSize = chunkSize;
 
         this.directionX = directionX;
         this.directionY = directionY;
         this.radius += radius;
         this.camera = viewer;
+        this.level = level;
+        this.myDirection = myDirection;
 
         this.isVisible = isVisible;
 
@@ -46,11 +50,10 @@ public class ChunkFace
         Vector3 newPosition = CalculePositionOfSphere();
 
         normal = newPosition.normalized;
-        //  bounds = new Bounds(CalculePositionOfSphere(), new Vector3(1, 0, 1) * chunkSize * scale);
+ 
         bounds = new Bounds(newPosition, newPosition.normalized * scale);
 
         positionToDraw = new Vector4((position.x), (position.y), (position.z), scale);
-        // this.position.y += radius;
 
         Update(viewer.transform.position, isVisible);
     }
@@ -74,6 +77,7 @@ public class ChunkFace
         {
             isVisible = FrustumCulling.Frustum(camera, bounds.center, scale * 0.5f, normal);
         }
+
         var dist = Vector3.Distance(viewerPositon, bounds.ClosestPoint(viewerPositon));
 
         if (parentChunk != null)
@@ -110,9 +114,156 @@ public class ChunkFace
         return positionsList;
     }
 
+    public void GetPosition2()
+    {
+        if(chunkTree != null)
+        {
+            foreach (var item in chunkTree)
+            {
+                item.GetPosition2();
+            }
+        }
+        else
+        {
+           // Debug.Log(parentChunk.FindEnge(myDirection));
+        }
+    }
+
+    public Vector4 FindEnge(string direction)
+    {
+        Vector4 activeEdge;
+        float right = 0;
+        float left = 0;
+        float bottom = 0;
+        float top = 0;
+        Stack<string> myStack = new Stack<string>();
+
+        switch (direction)
+        {
+            case "lefttop":
+                right = chunkTree[1].IsHasChild();
+                bottom = chunkTree[2].IsHasChild();
+                if (parentChunk != null)
+                {
+                    left = parentChunk.FindEdge("left", myStack, "left") ? 1 : 0;
+                    top = parentChunk.FindEdge("top", myStack, "top") ? 1 : 0;
+                }
+                break;
+            case "righttop":
+                left = chunkTree[0].IsHasChild();
+                bottom = chunkTree[3].IsHasChild();
+                if (parentChunk != null)
+                {
+                    right = parentChunk.FindEdge("right", myStack, "right") ? 1 : 0;
+                    top = parentChunk.FindEdge("top", myStack, "top") ? 1 : 0;
+                }
+                break;
+            case "leftbottom":
+                top = chunkTree[0].IsHasChild();
+                right = chunkTree[3].IsHasChild();
+                if (parentChunk != null)
+                {
+                    left = parentChunk.FindEdge("left", myStack, "left") ? 1 : 0;
+                    bottom = parentChunk.FindEdge("bottom", myStack, "bottom") ? 1 : 0;
+                }
+                break;
+            case "rightbottom":
+                top = chunkTree[1].IsHasChild();
+                left = chunkTree[2].IsHasChild();
+                if (parentChunk != null)
+                {
+          
+                    right = parentChunk.FindEdge("right", myStack, "right") ? 1 : 0;
+                    bottom = parentChunk.FindEdge("bottom", myStack, "bottom") ? 1 : 0;
+                }
+                break;
+            default:
+                break;
+        }
+
+        activeEdge = new Vector4(top, right,bottom, left);
+
+        return activeEdge;
+    }
+
+    public bool FindEdge(string baseDirection, Stack<string> positionsList, string ask)
+    {
+        if(baseDirection != ask && parentChunk != null)
+        {
+            return FindEdgeInsite(positionsList, ask);
+        }
+        else if(parentChunk != null)
+        {
+            positionsList.Push(baseDirection);
+            return parentChunk.FindEdge(myDirection, positionsList, ask);
+        }
+
+        return false;
+    }
+
+    public bool FindEdgeInsite(Stack<string> positionStack, string direction)
+    {
+
+        if(positionStack.Count == 0)
+        {
+            return true;
+        }
+        else if (parentChunk == null)
+        {
+            return false;
+        }
+
+        string backDirection = positionStack.Pop();
+        bool isEdge = false;
+
+        switch (direction)
+        {
+            case "right":
+                backDirection = backDirection.Replace(direction, "left");
+                break;
+            case "left":
+                backDirection = backDirection.Replace(direction, "right");
+                break;
+            case "top":
+                backDirection = backDirection.Replace(direction, "bottom");
+                break;
+            case "bottom":
+                backDirection = backDirection.Replace("top", direction);
+                break;
+        }
+
+        switch (backDirection)
+        {
+            case "lefttop":
+                isEdge = chunkTree[0].FindEdgeInsite(positionStack, direction);
+                break;
+            case "righttop":
+                isEdge = chunkTree[1].FindEdgeInsite(positionStack, direction);
+                break;
+            case "leftbottom":
+                isEdge = chunkTree[2].FindEdgeInsite(positionStack, direction);
+                break;
+            case "rightbottom":
+                isEdge = chunkTree[3].FindEdgeInsite(positionStack, direction);
+                break;          
+        }
+
+        return isEdge;
+
+
+    }
+
     private float CalculeTessellatio(float distance)
     {
-        return (distance * 100) / (4 * scale - scale) * 2 + 1;
+        if(distance > 800)
+        {
+            return 0;
+        }
+        else
+        {
+            float tessellation = 1 - (distance - scale * 2) / (scale * 2);
+            return tessellation;
+        }
     }
 
     public ChunkFace[] getChunkTree()
@@ -155,6 +306,15 @@ public class ChunkFace
         return directionList;
     }
 
+    public float IsHasChild()
+    {
+        if(chunkTree != null)
+        {
+            return 1;
+        }
+        return 0;
+    }
+
 
     public void MergeChunk()
     {
@@ -192,12 +352,11 @@ public class ChunkFace
             Vector3 forward = (directionY * scale / 4);
 
             chunkTree = new ChunkFace[] {
-                new ChunkFace(this, position - left + forward,  newScale, chunkSize, camera, directionX, directionY, radius, isVisible),
-                new ChunkFace(this, position + left + forward,  newScale, chunkSize, camera, directionX, directionY, radius, isVisible),
-                new ChunkFace(this, position - left - forward,  newScale, chunkSize, camera, directionX, directionY, radius, isVisible),
-                new ChunkFace(this, position + left - forward,  newScale, chunkSize, camera, directionX, directionY, radius, isVisible)
+                new ChunkFace(this, position - left + forward,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, "lefttop"),
+                new ChunkFace(this, position + left + forward,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, "righttop"),
+                new ChunkFace(this, position - left - forward,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, "leftbottom"),
+                new ChunkFace(this, position + left - forward,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, "rightbottom")
             };
-
 
         }
         positionsList.Clear();
