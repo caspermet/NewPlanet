@@ -7,7 +7,7 @@ public class DrawMeshInstanced  {
     int instanceCount = 100000;
     Mesh instanceMesh;
     Material instanceMaterial;
-    int subMeshIndex = 0;
+    int subMeshIndex = 2;
     Vector4[] positions;
     Vector4[] directions;
 
@@ -44,9 +44,7 @@ public class DrawMeshInstanced  {
 
     public  void UpdateBuffers(Material instanceMaterial)
     {
-        // Ensure submesh index is in range
-        if (instanceMesh != null)
-            subMeshIndex = Mathf.Clamp(subMeshIndex, 0, instanceMesh.subMeshCount - 1);
+
 
         // Positions
         if (positionBuffer != null)

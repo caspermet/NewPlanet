@@ -39,6 +39,8 @@ public class PlanetGenerator : MonoBehaviour
     public float[] planetTextureRange;
     private float[] planetTextureRangeOld;
 
+    MaterialPropertyBlock materialBlock;
+
 
     GameObject sphere;
 
@@ -71,6 +73,22 @@ public class PlanetGenerator : MonoBehaviour
         instanceMaterial.SetVector("_PlanetInfo", planetInfo);
         instanceMaterial.SetFloat("_Gamma", gamma);
         instanceMaterial.SetFloat("fHdrExposure", hdrExposure);
+
+
+        materialBlock.SetTexture("_SurfaceTexture", LoadArrayTexture.DoTexture(planetTexture));
+
+        materialBlock.SetTexture("_PlanetTexturesTop", LoadArrayTexture.DoTexture(planetMapTextureTop));
+        materialBlock.SetTexture("_PlanetTexturesBottom", LoadArrayTexture.DoTexture(planetMapTextureBottom));
+        materialBlock.SetTexture("_PlanetHeightMapTop", LoadArrayTexture.DoTexture(planetHeightMapTop));
+        materialBlock.SetTexture("_PlanetHeightMapBottom", LoadArrayTexture.DoTexture(planetHeightMapBottom));
+        materialBlock.SetTexture("_noiseTexture", perlinNoise = PerlingNoise.CreateNoise((int)width, noise));
+
+        materialBlock.SetInt("_TexturesArrayLength", planetTextureRange.Length);
+        materialBlock.SetFloatArray("_TexturesArray", planetTextureRange);
+        materialBlock.SetVector("_CameraPosition", camera.transform.position);
+        materialBlock.SetVector("_PlanetInfo", planetInfo);
+        materialBlock.SetFloat("_Gamma", gamma);
+        materialBlock.SetFloat("fHdrExposure", hdrExposure);
     }
 
     void CreateSpehere()
