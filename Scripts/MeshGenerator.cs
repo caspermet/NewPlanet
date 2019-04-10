@@ -4,12 +4,12 @@ using System.Collections;
 public static class MeshGenerator
 {
 
-    public static MeshData GenerateTerrainMesh(int chunkSize, int scale)
+    public static Mesh GenerateTerrainMesh(int chunkSize, int scale, Mesh mesh)
     {
         float topLeftX = (chunkSize - 1) / -2f;
         float topLeftZ = (chunkSize - 1) / 2f;
 
-        MeshData meshData = new MeshData(chunkSize, chunkSize, 0);
+        MeshData meshData = new MeshData(chunkSize, chunkSize, 0, mesh);
         int vertexIndex = 0;
 
         for (int y = 0; y < chunkSize; y++)
@@ -34,7 +34,7 @@ public static class MeshGenerator
         return meshData;
     }
 
-    public static MeshData GenerateTerrainMeshRight(int chunkSize, int scale)
+    public static Mesh GenerateTerrainMeshRight(int chunkSize, int scale, Mesh mesh)
     {
         float topLeftX = (chunkSize - 1) / -2f;
         float topLeftZ = (chunkSize - 1) / 2f;
@@ -74,7 +74,7 @@ public static class MeshGenerator
         return meshData;
     }
 
-    public static MeshData GenerateTerrainMeshTwoEdge(int chunkSize, int scale)
+    public static Mesh GenerateTerrainMeshTwoEdge(int chunkSize, int scale, Mesh mesh)
     {
         float topLeftX = (chunkSize - 1) / -2f;
         float topLeftZ = (chunkSize - 1) / 2f;
@@ -135,7 +135,7 @@ public static class MeshGenerator
         return meshData;
     }
 
-    public static MeshData GenerateTerrainMeshThreeEdge(int chunkSize, int scale)
+    public static Mesh GenerateTerrainMeshThreeEdge(int chunkSize, int scale, Mesh mesh)
     {
         float topLeftX = (chunkSize - 1) / -2f;
         float topLeftZ = (chunkSize - 1) / 2f;
@@ -222,16 +222,17 @@ public class MeshData
     public Vector3[] vertices;
     public int[] triangles;
     public Vector2[] uvs;
-
     private Mesh mesh;
+    private int meshIndex;
 
     int triangleIndex;
 
-    public MeshData(int meshWidth, int meshHeight, int meshEdge)
+    public MeshData(int meshWidth, int meshHeight, int meshEdge, Mesh mesh)
     {
         vertices = new Vector3[meshWidth * meshHeight + meshEdge - 1];
         triangles = new int[(meshWidth - 1) * (meshHeight - 1) * 6 + (meshEdge - 1) * 3];
-       
+        this.mesh = mesh;
+        meshIndex = mesh.subMeshCount;
     }
 
     public void AddTriangle(int a, int b, int c)
@@ -244,10 +245,10 @@ public class MeshData
 
     public void CreateMesh()
     {
-        mesh = new Mesh();
         mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        mesh.uv = uvs;
+
+        mesh.SetTriangles(triangles, meshIndex);
+        mesh.SetVertices(vertices, meshIndex);
         mesh.RecalculateNormals();
 
     }
@@ -256,5 +257,4 @@ public class MeshData
     {
         return mesh;
     }
-
 }
