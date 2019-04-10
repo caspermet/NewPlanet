@@ -3,7 +3,7 @@
 	Calcule height value from heighMap
 */
 float3 CalcUVFromHM(float3 position, float2 uvCoor, float3 normPosition) {
-
+	 
 	float3 worldPosition;
 	float4 noiseValue = float4(0,0,0,0);
 
@@ -45,8 +45,8 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 {
 	VS_OUTPUT o;
 
-	float4 data = positionBuffer[instanceID];
-	float4 transform = directionsBuffer[instanceID];
+	float4 data = positionBuffer2[instanceID];
+	float4 transform = directionsBuffer2[instanceID];
 
 	float4 pos = v.vertex;
 

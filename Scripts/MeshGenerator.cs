@@ -122,7 +122,7 @@ public static class MeshGenerator
                     }
 
                     vertexIndex++;
-                    Debug.Log(vertexIndex);
+             
                 }
             }
             
@@ -153,7 +153,6 @@ public class MeshData
 
     public void newTriangles(int index)
     {
-        Debug.Log((meshWidth - 1) * (meshWidth - 1) * 6 + (meshWidth - 1) * 3 * index);
         triangles = null;
         triangles = new int[(meshWidth - 1) * (meshWidth - 1) * 6 + (meshWidth  - 1) * 3 * 3];
         meshIndex = index;

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlanetGenerator : MonoBehaviour
 {
+    public MaterialPropertyBlock materialBlock;
+
     public float noise = 20;
     public float width = 20;
 
@@ -39,7 +41,10 @@ public class PlanetGenerator : MonoBehaviour
     public float[] planetTextureRange;
     private float[] planetTextureRangeOld;
 
-    MaterialPropertyBlock materialBlock;
+    public Material[] instanceMaterials;
+
+
+
 
 
     GameObject sphere;
@@ -53,27 +58,14 @@ public class PlanetGenerator : MonoBehaviour
         cameraEditor = new CameraEdit(camera, maxScale / 2);
         CreateSpehere();
         SetMaterialProperties();
-        chunk = new Chunk(maxScale, chunkSize, instanceMaterial, camera);
+        chunk = new Chunk(maxScale, chunkSize, instanceMaterials, camera, materialBlock);
     }
 
     public Texture2D perlinNoise;
     void SetMaterialProperties()
     {
-        instanceMaterial.SetTexture("_SurfaceTexture", LoadArrayTexture.DoTexture(planetTexture));
 
-        instanceMaterial.SetTexture("_PlanetTexturesTop", LoadArrayTexture.DoTexture(planetMapTextureTop));
-        instanceMaterial.SetTexture("_PlanetTexturesBottom", LoadArrayTexture.DoTexture(planetMapTextureBottom));
-        instanceMaterial.SetTexture("_PlanetHeightMapTop", LoadArrayTexture.DoTexture(planetHeightMapTop));
-        instanceMaterial.SetTexture("_PlanetHeightMapBottom", LoadArrayTexture.DoTexture(planetHeightMapBottom));
-        instanceMaterial.SetTexture("_noiseTexture", perlinNoise = PerlingNoise.CreateNoise((int)width, noise));
-
-        instanceMaterial.SetInt("_TexturesArrayLength", planetTextureRange.Length);
-        instanceMaterial.SetFloatArray("_TexturesArray", planetTextureRange);
-        instanceMaterial.SetVector("_CameraPosition", camera.transform.position);
-        instanceMaterial.SetVector("_PlanetInfo", planetInfo);
-        instanceMaterial.SetFloat("_Gamma", gamma);
-        instanceMaterial.SetFloat("fHdrExposure", hdrExposure);
-
+        materialBlock = new MaterialPropertyBlock();
 
         materialBlock.SetTexture("_SurfaceTexture", LoadArrayTexture.DoTexture(planetTexture));
 
@@ -102,14 +94,14 @@ public class PlanetGenerator : MonoBehaviour
 
     void Update()
     {
-        instanceMaterial.SetInt("_TexturesArrayLength", planetTextureRange.Length);
-        instanceMaterial.SetFloatArray("_TexturesArray", planetTextureRange);
-        instanceMaterial.SetVector("_CameraPosition", camera.transform.position);
+        materialBlock.SetInt("_TexturesArrayLength", planetTextureRange.Length);
+        materialBlock.SetFloatArray("_TexturesArray", planetTextureRange);
+        materialBlock.SetVector("_CameraPosition", camera.transform.position);
 
        // atmosphereMaterial.SetTexture("_noise", PerlingNoise.CreateNoise((int)width, noise));
 
         cameraEditor.cameraUpdate();
-        chunk.Update(instanceMaterial);
+        chunk.Update(instanceMaterials, materialBlock);
     }
 
     void OnDisable()

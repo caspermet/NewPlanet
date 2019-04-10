@@ -446,7 +446,7 @@ MonoBehaviour:
   instanceMaterial: {fileID: 2100000, guid: 146d4615ee2e36e478c30c0e70e88a41, type: 2}
   camera: {fileID: 431095063}
   maxScale: 50
-  chunkSize: 32
+  chunkSize: 4
   maxTerrainHeight: 1
   planetTexture:
   - {fileID: 2800000, guid: 69dd8e0340637544a9b3c7d260f5f081, type: 3}
@@ -482,6 +482,11 @@ MonoBehaviour:
   - 0.76
   - 0.48
   - 0
+  instanceMaterials:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   perlinNoise: {fileID: 0}
 --- !u!4 &1740869425
 Transform:

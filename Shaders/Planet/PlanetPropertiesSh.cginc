@@ -40,6 +40,8 @@ buffery for instancing
 ***************/
 StructuredBuffer<float4> positionBuffer;
 StructuredBuffer<float4> directionsBuffer;
+StructuredBuffer<float4> positionBuffer2;
+StructuredBuffer<float4> directionsBuffer2;
 
 /********************
 HeightMap textures
