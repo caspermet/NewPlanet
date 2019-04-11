@@ -97,7 +97,7 @@ public class ChunkFace
 
             if (distParent / 2 > parentChunk.GetScale())
             {
-              
+
                 parentChunk.MergeChunk();
                 return;
             }
@@ -124,8 +124,9 @@ public class ChunkFace
     public void GetPosition2()
     {
         ClearPositionAndDirection();
-        Vector4 newDirection = new Vector4(directionX.x, directionX.y, directionX.z, 1);
-        if(parentChunk == null)
+        Vector4 newDirection = new Vector4(directionX.x, directionX.y, directionX.z, 0);
+        int rotate;
+        if (parentChunk == null)
         {
             positionsListArray[0].Add(positionToDraw);
             directionListArray[0].Add(newDirection);
@@ -134,10 +135,18 @@ public class ChunkFace
 
         Vector4 edge = parentChunk.FindEnge(myDirection);
 
+        int suma = (int)(edge.x + edge.y + edge.z + edge.w);
+        rotate = CalculRotate.CalculRotateOfMesh(edge, suma);
+
+        newDirection.w += rotate;
+
+        positionsListArray[suma].Add(positionToDraw);
+        directionListArray[suma].Add(newDirection);
+
         if (edge.x == 1 || edge.y == 1 || edge.z == 1 || edge.w == 1)
         {
-            positionsListArray[1].Add(positionToDraw);
-            directionListArray[1].Add(newDirection);
+            positionsListArray[suma].Add(positionToDraw);
+            directionListArray[suma].Add(newDirection);
         }
         else
         {
@@ -145,8 +154,8 @@ public class ChunkFace
             directionListArray[0].Add(newDirection);
         }
 
-     /*   positionsListArray[0].Add(positionToDraw);
-        directionListArray[0].Add(newDirection);*/
+        /*   positionsListArray[0].Add(positionToDraw);
+           directionListArray[0].Add(newDirection);*/
 
     }
 
@@ -167,15 +176,15 @@ public class ChunkFace
         float bottom = 0;
         float top = 0;
         Stack<string> myStack = new Stack<string>();
- 
-        if(chunkTree == null)
+
+        if (chunkTree == null)
         {
-            activeEdge = new Vector4(top, right, bottom, left);
+            activeEdge = new Vector4(right, bottom, left, top);
             return activeEdge;
         }
         switch (direction)
         {
-            case "lefttop":             
+            case "lefttop":
                 right = chunkTree[1].IsHasChild();
                 bottom = chunkTree[2].IsHasChild();
                 if (parentChunk != null)
@@ -216,7 +225,7 @@ public class ChunkFace
                 break;
         }
 
-        activeEdge = new Vector4(top, right, bottom, left);
+        activeEdge = new Vector4(right, bottom, left, top);
 
         return activeEdge;
     }
@@ -354,25 +363,25 @@ public class ChunkFace
             return null;
         }
 
-    
+
         if (chunkTree == null)
         {
             ClearPositionAndDirection();
             GetPosition2();
-          
+
             return positionsListArray;
         }
         else
         {
             ClearPositionAndDirection();
-          //  Debug.Log(chunkTree.Length);
+            //  Debug.Log(chunkTree.Length);
             foreach (var chunk in chunkTree)
             {
-                
+
                 List<Vector4>[] pom = chunk.findAllChunkToDraw();
                 List<Vector4>[] pomDir = chunk.findDirection();
-                
-                if(pom == null)
+
+                if (pom == null)
                 {
                     continue;
                 }
@@ -381,10 +390,10 @@ public class ChunkFace
                 {
                     positionsListArray[i].AddRange(pom[i]);
                     directionListArray[i].AddRange(pomDir[i]);
-                   /* if (positionsListArray[i].Count > 0)
-                        Debug.Log(positionsListArray[i].Count);*/
+                    /* if (positionsListArray[i].Count > 0)
+                         Debug.Log(positionsListArray[i].Count);*/
                 }
-            }         
+            }
         }
 
         return positionsListArray;
@@ -411,7 +420,7 @@ public class ChunkFace
 
         chunkTree = null;
 
-        ClearPositionAndDirection(); 
+        ClearPositionAndDirection();
     }
 
     public void SubDivide(Vector3 viewerPosition)
@@ -428,11 +437,11 @@ public class ChunkFace
         {
             float newScale = scale * 0.5f;
 
-            Vector3 left = (directionX * scale / 4);
+            Vector3 left = (new Vector3(directionX.x,directionX.y, directionX.z) * scale / 4);
             Vector3 forward = (directionY * scale / 4);
 
             chunkTree = new ChunkFace[] {
-                new ChunkFace(this, position - left + forward,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, "lefttop"),
+                new ChunkFace(this, position - left  + forward,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, "lefttop"),
                 new ChunkFace(this, position + left + forward,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, "righttop"),
                 new ChunkFace(this, position - left - forward,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, "leftbottom"),
                 new ChunkFace(this, position + left - forward,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, "rightbottom")

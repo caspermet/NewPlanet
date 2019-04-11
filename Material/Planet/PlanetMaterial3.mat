@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: PlanetMaterial
+  m_Name: PlanetMaterial3
   m_Shader: {fileID: 4800000, guid: 876df46a69fa783418aad8982c9cb465, type: 3}
   m_ShaderKeywords: _FLIPNOISE_ON
   m_LightmapFlags: 4
@@ -160,6 +160,7 @@ Material:
     - _rX: 52.87
     - _rY: 186.7
     - _rZ: 0
+    - _rotate: 0
     - _tX: 5.38
     - _tY: 0
     - _tZ: 0

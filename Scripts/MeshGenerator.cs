@@ -95,6 +95,12 @@ public static class MeshGenerator
                         meshData.AddTriangle(vertexIndex, vertexIndex + chunkSize + 3, vertexIndex + chunkSize + 2);
                         meshData.AddTriangle(vertexIndex + 1 + 1, vertexIndex, vertexIndex + 1);
                     }
+                    else if ((x == chunkSize - 2 && y < chunkSize - 1 && i == 1))
+                    {
+                        meshData.AddTriangle(vertexIndex, vertexIndex + 1, vertexIndex + 2);
+                        meshData.AddTriangle(vertexIndex, vertexIndex + 2, vertexIndex + chunkSize + 4 + x);
+                        meshData.AddTriangle(vertexIndex, vertexIndex + chunkSize + 4 + x, vertexIndex + chunkSize + 2 + x);
+                    }
 
                     else if (x == 0 && y < chunkSize - 1 && i == 3)
                     {

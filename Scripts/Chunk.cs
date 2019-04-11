@@ -49,7 +49,7 @@ public class Chunk
 
     private Mesh mesh;
 
-    int cubeSize = 1;
+    int cubeSize = 6;
 
     Material instanceMaterial;
     Material[] instanceMaterials;
@@ -61,6 +61,8 @@ public class Chunk
         //   planetRadius = (chunkSize - 1) * scale / 2;
         planetRadius = scale / 2;
 
+        //  directions = new Vector3[] { new Vector3(0, 0, -90), new Vector3(0, 180, 90), new Vector3(90, 270, 0), new Vector3(-90, 1, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 180) };
+        //  directions = new Vector4[] { new Vector4(1, 0, 0, 0), new Vector4(-1, 0, 0, 0), new Vector4(0, 1, 0, 0), new Vector4(0, -1, 0, 0), new Vector4(0, 0, 1, 0), new Vector4(0, 0, -1, 0) };
         directions = new Vector3[] { new Vector3(1, 0, 0), new Vector3(-1, 0, 0), new Vector3(0, -1, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1), new Vector3(0, 0, -1) };
         directionsY = new Vector3[] { new Vector3(0, 1, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1), new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(1, 0, 0) };
         planetRadiusArray = new Vector3[] { new Vector3(0, 0, -planetRadius), new Vector3(0, 0, planetRadius), new Vector3(planetRadius, 0, 0), new Vector3(-planetRadius, 0, 0), new Vector3(0, planetRadius, 0), new Vector3(0, -planetRadius, 0) };
@@ -86,9 +88,11 @@ public class Chunk
 
         mesh = MeshGenerator.generateTerrainMeshWithSub(chunkSize, (int)scale);
 
-        drawMesh = new DrawMeshInstanced[2];
+        drawMesh = new DrawMeshInstanced[4];
         drawMesh[0] = new DrawMeshInstanced(mesh);
         drawMesh[1] = new DrawMeshInstanced(mesh);
+        drawMesh[2] = new DrawMeshInstanced(mesh);
+        drawMesh[3] = new DrawMeshInstanced(mesh);
         UpdateChunkMesh();
     }
 
@@ -178,7 +182,7 @@ public class Chunk
     private void UpdateAllMesh()
     {
 
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 4; i++)
         {
             Vector4[] viewedChunkCoordd;
             Vector4[] directionArray;

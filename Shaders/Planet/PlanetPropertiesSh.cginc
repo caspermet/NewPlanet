@@ -6,6 +6,7 @@ sampler2D _MainTex;
 sampler2D _HeightTex;
 float _FlipNoise;
 float _noiseHeight;
+float _rotate;
 
 /**************
 water

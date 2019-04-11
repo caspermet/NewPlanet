@@ -483,10 +483,10 @@ MonoBehaviour:
   - 0.48
   - 0
   instanceMaterials:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 146d4615ee2e36e478c30c0e70e88a41, type: 2}
+  - {fileID: 2100000, guid: 7b46152e0f6fc3045b645b969c9dad3a, type: 2}
+  - {fileID: 2100000, guid: 495c30b4c3a649d4a9f481f1c9d15516, type: 2}
+  - {fileID: 2100000, guid: 146d4615ee2e36e478c30c0e70e88a41, type: 2}
   perlinNoise: {fileID: 0}
 --- !u!4 &1740869425
 Transform:

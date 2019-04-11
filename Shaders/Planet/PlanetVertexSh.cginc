@@ -41,6 +41,52 @@ float3 CalcUVFromHM(float3 position, float2 uvCoor, float3 normPosition) {
 	return worldPosition;
 }
 
+float3x3 RotateAroundXInDegrees(float degrees)
+{
+	float alpha = degrees * UNITY_PI / 180.0;
+	float sina, cosa;
+	sincos(alpha, sina, cosa);
+
+	return float3x3(
+		1, 0, 0,
+		0, cosa, sina,
+		0, -sina, cosa);
+
+}
+
+float3x3 RotateAroundYInDegrees(float degrees)
+{
+	float alpha = degrees * UNITY_PI / 180.0;
+	float sina, cosa;
+	sincos(alpha, sina, cosa);
+
+
+	return float3x3(
+		cosa, 0, -sina,
+		0, 1, 0,
+		sina, 0, cosa);
+}
+
+float3x3 RotateAroundZInDegrees(float degrees)
+{
+	float alpha = degrees * UNITY_PI / 180.0;
+	float c, s;
+	sincos(alpha, s, c);
+
+	return float3x3(c, -s, 0, s, c, 0, 0, 0, 1);
+
+}
+
+float3 RotateAroundZInDegreess(float3 vertex, float degrees)
+{
+	float alpha = degrees * UNITY_PI / 180.0;
+	float sina, cosa;
+	sincos(alpha, sina, cosa);
+	float2x2 m = float2x2(cosa, -sina, sina, cosa);
+	//return float3(mul(m, vertex.xz), vertex.y).xzy;
+	return float3(mul(m, vertex.xy), vertex.z).zxy;
+}
+
 VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 {
 	VS_OUTPUT o;
@@ -48,8 +94,14 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	float4 data = positionBuffer2[instanceID];
 	float4 transform = directionsBuffer2[instanceID];
 
-	float4 pos = v.vertex;
+//	float4 pos = v.vertex;
 
+	
+	//v.vertex.xyz = mul(RotateAroundZInDegrees(_rotate), pos.xyz);
+
+	v.vertex.xyz = mul(RotateAroundYInDegrees(-transform.w + _rotate), v.vertex.xyz);
+	float3 pos = v.vertex.xyz;
+	
 	if (transform.x != 0) {
 		v.vertex.y = mul(transform.x, pos.z);
 		v.vertex.z = 0;
@@ -61,10 +113,13 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	else if (transform.z == -1) {
 		v.vertex.x = -pos.x;
 	}
+	
 
 	float3 localPosition = v.vertex.xyz * data.w;
 	float3 worldPosition = data.xyz + localPosition;
 	float3 worldNormal = v.normal;
+
+	
 
 
 	float x = worldPosition.x / _PlanetInfo.x;;
@@ -74,6 +129,14 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	float dx = x * sqrt(1.0f - (y*y * 0.5f) - (z * z * 0.5f) + (y*y*z*z / 3.0f));
 	float dy = y * sqrt(1.0f - (z*z * 0.5f) - (x * x * 0.5f) + (z*z*x*x / 3.0f));
 	float dz = z * sqrt(1.0f - (x*x * 0.5f) - (y * y * 0.5f) + (x*x*y*y / 3.0f));
+
+	 dx = x;
+	 dy = y;
+	 dz = z;
+
+
+
+
 	o.normal = float3(dx, dy, dz);
 
 	worldPosition.xyz = float3(dx, dy, dz) * _PlanetInfo.x;
@@ -82,7 +145,7 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	float3 n = normalize(float3(worldPosition.x, worldPosition.y, worldPosition.z));
 	float uCoor = atan2(n.z, n.x) / (2 * PI) + 0.5f;
 	float vCoor = asin(n.y) / PI + 0.5f; 
-	float tessellation = transform.w * _TessMax;
+	float tessellation = 1;
 
 	/**************************
 	calcul if is water
