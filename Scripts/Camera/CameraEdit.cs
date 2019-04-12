@@ -23,7 +23,7 @@ public class CameraEdit
 
     public void SetDefaultCameraPosition()
     {
-        camera.transform.position = new Vector3(0, 0, -(distance * 1.2f));
+        camera.transform.position = new Vector3(0, 0, -(distance * 4f));
     }
 
     public void cameraUpdate()

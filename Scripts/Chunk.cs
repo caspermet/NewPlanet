@@ -49,7 +49,7 @@ public class Chunk
 
     private Mesh mesh;
 
-    int cubeSize = 6;
+    int cubeSize = 1;
 
     Material instanceMaterial;
     Material[] instanceMaterials;
@@ -83,7 +83,7 @@ public class Chunk
 
         for (int index = 0; index < 6; index++)
         {
-            chunkFace[index] = new ChunkFace(null, planetRadiusArray[index], this.scale, camera, directions[index], directionsY[index], planetRadius, true, 0, "");
+            chunkFace[index] = new ChunkFace(null, planetRadiusArray[index], this.scale, camera, directions[index], directionsY[index], planetRadius, true, 0, null);
         }
 
         mesh = MeshGenerator.generateTerrainMeshWithSub(chunkSize, (int)scale);
