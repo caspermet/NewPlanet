@@ -97,21 +97,36 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 //	float4 pos = v.vertex;
 
 	
-	//v.vertex.xyz = mul(RotateAroundZInDegrees(_rotate), pos.xyz);
-
-	v.vertex.xyz = mul(RotateAroundYInDegrees(-transform.w + _rotate), v.vertex.xyz);
+	//v.vertex.xyz = mul(RotateAroundYInDegrees(_rotate), v.vertex.xyz);
 	float3 pos = v.vertex.xyz;
 	
-	if (transform.x != 0) {
+	if (transform.z != 0 && transform.y != 0) {
+		v.vertex.xyz = mul(RotateAroundYInDegrees(-transform.w   + transform.z * 90), v.vertex.xyz);
+
+		pos = v.vertex.xyz;
+		v.vertex.y = mul(transform.z * -1, pos.x);
+		v.vertex.x = 0;
+	}
+	else if (transform.x != 0 && transform.y != 0) {
+		//v.vertex.xyz = mul(RotateAroundYInDegrees(-transform.w * transform.x ), v.vertex.xyz);
+		if (transform.x == 1) {
+			v.vertex.xyz = mul(RotateAroundYInDegrees(-transform.w), v.vertex.xyz);
+		}
+		else {
+			v.vertex.xyz = mul(RotateAroundYInDegrees(-transform.w + 180), v.vertex.xyz);
+		}
+	
+		pos = v.vertex.xyz;
 		v.vertex.y = mul(transform.x, pos.z);
 		v.vertex.z = 0;
 	}
-	else if (transform.y != 0) {
-		v.vertex.y = mul(transform.y, pos.x);
-		v.vertex.x = 0;
-	}
-	else if (transform.z == -1) {
+	else if (transform.x == -1 && transform.z != 0) {
+		v.vertex.xyz = mul(RotateAroundYInDegrees(-transform.w + _rotate), v.vertex.xyz);
+		pos = v.vertex.xyz;
 		v.vertex.x = -pos.x;
+	}
+	else {
+		v.vertex.xyz = mul(RotateAroundYInDegrees(-transform.w ), v.vertex.xyz);
 	}
 	
 
@@ -129,12 +144,6 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	float dx = x * sqrt(1.0f - (y*y * 0.5f) - (z * z * 0.5f) + (y*y*z*z / 3.0f));
 	float dy = y * sqrt(1.0f - (z*z * 0.5f) - (x * x * 0.5f) + (z*z*x*x / 3.0f));
 	float dz = z * sqrt(1.0f - (x*x * 0.5f) - (y * y * 0.5f) + (x*x*y*y / 3.0f));
-
-	 dx = x;
-	 dy = y;
-	 dz = z;
-
-
 
 
 	o.normal = float3(dx, dy, dz);

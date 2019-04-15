@@ -40,7 +40,7 @@ public class Chunk
 
     private ChunkFace[] chunkFace;
 
-    private Vector3[] directions;
+    private Vector4[] directions;
     private Vector3[] directionsY;
     private Vector3[] planetRadiusArray;
 
@@ -49,7 +49,7 @@ public class Chunk
 
     private Mesh mesh;
 
-    int cubeSize = 1;
+    int cubeSize = 6;
 
     Material instanceMaterial;
     Material[] instanceMaterials;
@@ -63,9 +63,9 @@ public class Chunk
 
         //  directions = new Vector3[] { new Vector3(0, 0, -90), new Vector3(0, 180, 90), new Vector3(90, 270, 0), new Vector3(-90, 1, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 180) };
         //  directions = new Vector4[] { new Vector4(1, 0, 0, 0), new Vector4(-1, 0, 0, 0), new Vector4(0, 1, 0, 0), new Vector4(0, -1, 0, 0), new Vector4(0, 0, 1, 0), new Vector4(0, 0, -1, 0) };
-        directions = new Vector3[] { new Vector3(1, 0, 0), new Vector3(-1, 0, 0), new Vector3(0, -1, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1), new Vector3(0, 0, -1) };
-        directionsY = new Vector3[] { new Vector3(0, 1, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1), new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(1, 0, 0) };
-        planetRadiusArray = new Vector3[] { new Vector3(0, 0, -planetRadius), new Vector3(0, 0, planetRadius), new Vector3(planetRadius, 0, 0), new Vector3(-planetRadius, 0, 0), new Vector3(0, planetRadius, 0), new Vector3(0, -planetRadius, 0) };
+        directions = new Vector4[]          { new Vector4(-1, 0, 0, 0),          new Vector4(1, 0, 0, 0),           new Vector4(0, 0, 1, 0),            new Vector4(0, 0, -1, 0),           new Vector4(1, 0, 0, 0),            new Vector4(-1, 0, 0, 0) };
+        directionsY = new Vector3[]         { new Vector3(0, 1, 0),             new Vector3(0, 1, 0),               new Vector3(0, 1, 0),               new Vector3(0, 1, 0),               new Vector3(0, 0, 1),               new Vector3(0, 0, 1) };
+        planetRadiusArray = new Vector3[]   { new Vector3(0, 0, planetRadius),  new Vector3(0, 0, -planetRadius),   new Vector3(planetRadius, 0, 0),    new Vector3(-planetRadius, 0, 0),   new Vector3(0, planetRadius, 0),    new Vector3(0, -planetRadius, 0) };
 
         this.scale = scale;
         this.viewer = viewer.transform;
@@ -81,10 +81,7 @@ public class Chunk
         chunkCoordArray = new Vector4[numberOfEdge][];
         chunkDirection = new Vector4[numberOfEdge][];
 
-        for (int index = 0; index < 6; index++)
-        {
-            chunkFace[index] = new ChunkFace(null, planetRadiusArray[index], this.scale, camera, directions[index], directionsY[index], planetRadius, true, 0, null);
-        }
+        createChunkFaces();
 
         mesh = MeshGenerator.generateTerrainMeshWithSub(chunkSize, (int)scale);
 
@@ -118,6 +115,28 @@ public class Chunk
         UpdateAllMesh();
     }
 
+    private void createChunkFaces()
+    {
+      /*  for (int index = 0; index < 6; index++)
+        {
+            chunkFace[index] = new ChunkFace(null, planetRadiusArray[index], this.scale, camera, directions[index], directionsY[index], planetRadius, true, 0, null);
+        }*/
+
+        chunkFace[0] = new ChunkFace( null, planetRadiusArray[0], this.scale, camera, directions[0], directionsY[0], planetRadius, true, 0, null);
+        chunkFace[1] = new ChunkFace( null, planetRadiusArray[1], this.scale, camera, directions[1], directionsY[1], planetRadius, true, 0, null);
+        chunkFace[2] = new ChunkFace( null, planetRadiusArray[2], this.scale, camera, directions[2], directionsY[2], planetRadius, true, 0, null);
+        chunkFace[3] = new ChunkFace( null, planetRadiusArray[3], this.scale, camera, directions[3], directionsY[3], planetRadius, true, 0, null);
+        chunkFace[4] = new ChunkFace( null, planetRadiusArray[4], this.scale, camera, directions[4], directionsY[4], planetRadius, true, 0, null);
+        chunkFace[5] = new ChunkFace( null, planetRadiusArray[5], this.scale, camera, directions[5], directionsY[5], planetRadius, true, 0, null);
+
+      /* chunkFace[0].UpdateTopNeighbor(new ChunkFace[] { chunkFace[4], chunkFace[3], chunkFace[5], chunkFace[2] });
+        chunkFace[1].UpdateTopNeighbor(new ChunkFace[] { chunkFace[4], chunkFace[2], chunkFace[5], chunkFace[3] });
+        chunkFace[2].UpdateTopNeighbor(new ChunkFace[] { chunkFace[4], chunkFace[0], chunkFace[5], chunkFace[1] });
+        chunkFace[3].UpdateTopNeighbor(new ChunkFace[] { chunkFace[4], chunkFace[1], chunkFace[5], chunkFace[0] });
+        chunkFace[4].UpdateTopNeighbor(new ChunkFace[] { chunkFace[0], chunkFace[2], chunkFace[1], chunkFace[3] });
+        chunkFace[5].UpdateTopNeighbor(new ChunkFace[] { chunkFace[0], chunkFace[2], chunkFace[1], chunkFace[3] });*/
+    }
+
     private void InitLists()
     {
         for (int i = 0; i < 4; i++)
@@ -131,11 +150,12 @@ public class Chunk
     private void UpdateChunkMesh()
     {    
 
-        for (int i = 0; i < cubeSize; i++)
+        for (int i =0; i < cubeSize; i++)
         {
 
             chunkFace[i].Update(viewerPosition, true);
         }
+       
 
         ClearPositionAndDirection();
 

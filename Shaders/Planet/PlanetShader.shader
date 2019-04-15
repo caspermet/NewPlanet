@@ -19,7 +19,7 @@
 
 		_TessMin("Tessellation", Range(1,5)) = 1
 		_TessMax("Tessellation", Range(1,5)) = 1
-		_rotate("rotate", Range(0,90)) = 0
+		_rotate("rotate", Range(0,360)) = 0
 
 
 			/**********************
