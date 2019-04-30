@@ -21,6 +21,8 @@
 		_TessMax("Tessellation", Range(1,5)) = 1
 		_rotate("rotate", Range(0,360)) = 0
 
+		_textureblend("bluer Texture", Range(0,0.1)) = 1
+
 
 			/**********************
 			Whater
@@ -50,7 +52,7 @@
 			#pragma vertex VS
 			#pragma fragment FS
 			#pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
-			//#pragma geometry geom
+			#pragma geometry geom
 		#ifdef UNITY_CAN_COMPILE_TESSELLATION
 			#pragma hull HS
 			#pragma domain DS

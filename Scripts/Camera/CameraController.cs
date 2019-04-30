@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Threading;
 
 
-public class CameraEdit
+public class CameraController
 {
 
     private Camera camera;
@@ -12,7 +12,7 @@ public class CameraEdit
 
     private FlyCamera flyCamera;
 
-    public CameraEdit(Camera camera, float distance)
+    public CameraController(Camera camera, float distance)
     {
         this.camera = camera;
         this.distance = distance;
@@ -23,11 +23,18 @@ public class CameraEdit
 
     public void SetDefaultCameraPosition()
     {
-        camera.transform.position = new Vector3(0, 0, -(distance * 4f));
+        camera.transform.position = new Vector3(0, 0, -(distance * 3f));
     }
 
     public void cameraUpdate()
     {
+        if(MenuData.IsPause == true)
+        {
+            return;
+        }
+
+
+        Cursor.visible = false;
         flyCamera.Update();
         EditFarPlane();
     }
@@ -36,7 +43,7 @@ public class CameraEdit
     {
         float farPlanedistance = Vector3.Distance(camera.transform.position, new Vector3(0, 0, 0));
         camera.farClipPlane = farPlanedistance;
-        if(distance < 100)
+        if(farPlanedistance - distance < 1000)
         {
             camera.nearClipPlane = 0.1f;
         }
@@ -44,6 +51,5 @@ public class CameraEdit
         {
             camera.nearClipPlane = 30;
         }
-
     }
 }

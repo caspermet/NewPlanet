@@ -39,6 +39,7 @@ HS_OUTPUT HS(InputPatch<VS_OUTPUT, 3> ip, uint id : SV_OutputControlPointID)
 	o.uv = ip[id].uv;
 	o.wordPosition = ip[id].wordPosition;
 	o.tess = ip[id].tess;
+	o.height = ip[id].height;
 
 	return o;
 }
@@ -52,6 +53,7 @@ DS_OUTPUT DS(HS_CONSTANT_OUTPUT input, OutputPatch<HS_OUTPUT, 3> ip, float3 b : 
 	o.uv = ip[0].uv*b.x + ip[1].uv*b.y + ip[2].uv*b.z;
 	o.wordPosition = ip[0].wordPosition*b.x + ip[1].wordPosition*b.y + ip[2].wordPosition*b.z;
 	o.normal = ip[0].normal*b.x + ip[1].normal*b.y + ip[2].normal*b.z;
+	o.height = ip[0].height*b.x + ip[1].height*b.y + ip[2].height*b.z;
 	o.vertex = UnityObjectToClipPos(o.vertex);
 	return o;
 }

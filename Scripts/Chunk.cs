@@ -129,12 +129,12 @@ public class Chunk
         chunkFace[4] = new ChunkFace( null, planetRadiusArray[4], this.scale, camera, directions[4], directionsY[4], planetRadius, true, 0, null);
         chunkFace[5] = new ChunkFace( null, planetRadiusArray[5], this.scale, camera, directions[5], directionsY[5], planetRadius, true, 0, null);
 
-      /* chunkFace[0].UpdateTopNeighbor(new ChunkFace[] { chunkFace[4], chunkFace[3], chunkFace[5], chunkFace[2] });
+        chunkFace[0].UpdateTopNeighbor(new ChunkFace[] { chunkFace[4], chunkFace[3], chunkFace[5], chunkFace[2] });
         chunkFace[1].UpdateTopNeighbor(new ChunkFace[] { chunkFace[4], chunkFace[2], chunkFace[5], chunkFace[3] });
         chunkFace[2].UpdateTopNeighbor(new ChunkFace[] { chunkFace[4], chunkFace[0], chunkFace[5], chunkFace[1] });
         chunkFace[3].UpdateTopNeighbor(new ChunkFace[] { chunkFace[4], chunkFace[1], chunkFace[5], chunkFace[0] });
         chunkFace[4].UpdateTopNeighbor(new ChunkFace[] { chunkFace[0], chunkFace[2], chunkFace[1], chunkFace[3] });
-        chunkFace[5].UpdateTopNeighbor(new ChunkFace[] { chunkFace[0], chunkFace[2], chunkFace[1], chunkFace[3] });*/
+        chunkFace[5].UpdateTopNeighbor(new ChunkFace[] { chunkFace[0], chunkFace[2], chunkFace[1], chunkFace[3] });
     }
 
     private void InitLists()

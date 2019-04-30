@@ -12,7 +12,7 @@ public class PlanetGenerator : MonoBehaviour
     public Transform viewer;
     public Material instanceMaterial;
     public Camera camera;
-    CameraEdit cameraEditor;
+    CameraController cameraController;
 
     public float maxScale;
 
@@ -43,20 +43,16 @@ public class PlanetGenerator : MonoBehaviour
 
     public Material[] instanceMaterials;
 
-
-
-
-
     GameObject sphere;
 
     void Start()
     {
-      
+        Debug.Log(MenuData.PlanetRadius);
         planetInfo.x = maxScale / 2;
         planetInfo.y = maxTerrainHeight;
 
-        cameraEditor = new CameraEdit(camera, maxScale / 2);
-        CreateSpehere();
+        cameraController = new CameraController(camera, maxScale / 2);
+        //  CreateSpehere();
         SetMaterialProperties();
         chunk = new Chunk(maxScale, chunkSize, instanceMaterials, camera, materialBlock);
     }
@@ -100,7 +96,7 @@ public class PlanetGenerator : MonoBehaviour
 
        // atmosphereMaterial.SetTexture("_noise", PerlingNoise.CreateNoise((int)width, noise));
 
-        cameraEditor.cameraUpdate();
+        cameraController.cameraUpdate();
         chunk.Update(instanceMaterials, materialBlock);
     }
 

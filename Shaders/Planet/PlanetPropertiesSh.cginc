@@ -7,6 +7,9 @@ sampler2D _HeightTex;
 float _FlipNoise;
 float _noiseHeight;
 float _rotate;
+float _textureblend;
+int _TexturesArrayLength;
+float _TexturesArray[20];
 
 /**************
 water
@@ -65,6 +68,7 @@ Planet Info
 float3 _PlanetInfo;
 
 
+
 /************************************
 Shader struct
 ***************************/
@@ -84,6 +88,7 @@ struct VS_OUTPUT
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
 	float tess : TEXCOORD2;
+	float height : TEXCOORD3;
 };
 
 struct HS_OUTPUT
@@ -93,6 +98,7 @@ struct HS_OUTPUT
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
 	float tess : TEXCOORD2;
+	float height : TEXCOORD3;
 };
 
 struct DS_OUTPUT
@@ -101,4 +107,13 @@ struct DS_OUTPUT
 	float3 normal : NORMAL;
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
+	float height : TEXCOORD2;
+};
+struct GM_OUTPUT
+{
+	float4 vertex : POSITION;
+	float3 normal : NORMAL;
+	float2 uv : TEXCOORD0;
+	float4 wordPosition : TEXCOORD1;
+	float height : TEXCOORD2;
 };
