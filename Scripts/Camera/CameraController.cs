@@ -33,6 +33,11 @@ public class CameraController
             return;
         }
 
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            PlanetData.isLODActive = !PlanetData.isLODActive;
+        }
+
 
         Cursor.visible = false;
         flyCamera.Update();

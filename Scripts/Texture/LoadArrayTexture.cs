@@ -5,22 +5,17 @@ using System.IO;
 
 public static class LoadArrayTexture
 {
-
-
-
     public static Texture2DArray DoTexture(Texture2D[] ordinaryTextures)
     {
 
 
         Texture2DArray texture2DArray = new
-            Texture2DArray(ordinaryTextures[0].width,
-            ordinaryTextures[0].height, ordinaryTextures.Length,
-            TextureFormat.RGBA32, true, false);
-        // Apply settings
+        Texture2DArray(ordinaryTextures[0].width,
+        ordinaryTextures[0].height, ordinaryTextures.Length,
+        TextureFormat.RGBA32, true, false);
+     
         texture2DArray.filterMode = FilterMode.Bilinear;
         texture2DArray.wrapMode = TextureWrapMode.Repeat;
-        // Loop through ordinary textures and copy pixels to the
-        // Texture2DArray
 
         for (int i = 0; i < ordinaryTextures.Length; i++)
         {
@@ -29,7 +24,7 @@ public static class LoadArrayTexture
             texture2DArray.SetPixels(text.GetPixels(0),
                 i, 0);
         }
-        // Apply our changes
+
         texture2DArray.Apply();
 
 

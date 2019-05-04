@@ -9,7 +9,8 @@ void geom(triangle DS_OUTPUT IN[3], inout TriangleStream<GM_OUTPUT> tristream)
 		//o.normal = normall;
 		o.vertex = IN[i].vertex;
 		o.normal = IN[i].normal;
-	
+		o.normal2 = IN[i].normal2;
+
 		o.uv = IN[i].uv;
 		o.wordPosition = IN[i].wordPosition;
 		o.height = IN[i].height;
@@ -18,20 +19,25 @@ void geom(triangle DS_OUTPUT IN[3], inout TriangleStream<GM_OUTPUT> tristream)
 }
 
 
-
-
-
 float3 calcColor2(GM_OUTPUT input, float3 textureColor) {
 
 	float3 normalDirection = input.normal;
+	float3 normalDirection2 = input.normal2;
 
 	float3 viewDirection = normalize(_WorldSpaceCameraPos - input.wordPosition.xyz);
 	float3 lightDirection = normalize(_WorldSpaceLightPos0.xyz);
 
-	float3 diff = _LightColor0.rgb * max(0, dot(lightDirection, normalize(normalDirection + (0.2 * lightDirection))));
+	//float3 diff = _LightColor0.rgb * max(0, dot(lightDirection, normalize(normalDirection + (0.2 * lightDirection))));
+	float3 diff = _LightColor0.rgb * max(0, dot(lightDirection, normalize(normalDirection2 + (0.2 * lightDirection))));
 	float3 spec = _SpecColor.rgb * pow(max(0, dot(reflect(-lightDirection, normalDirection), viewDirection)), _Shininess);
 
 	// DIFFUSE + NORMAL
+	diff.x = diff.x < 0.1 ? 0.1 : diff.x;
+	diff.y = diff.y < 0.1 ? 0.1 : diff.y;
+	diff.z = diff.z < 0.1 ? 0.1 : diff.z;
+
+	//diff =  lerp(diff, diff2, 0.5);
+
 	float3 c = diff * pow(textureColor, _Gamma);
 
 	// SPECULAR
@@ -41,12 +47,32 @@ float3 calcColor2(GM_OUTPUT input, float3 textureColor) {
 	c = 1.0 - exp(c * -fHdrExposure);
 
 	// GAMMA CORRECTION
-	c = pow(c, 1 / _Gamma);
+	//c = pow(c, 1 / );
 
 	return c;
 }
 
-fixed4 FS(GM_OUTPUT i) : SV_Target
+float3 ShowLODSystem(float height) {
+	float interpolar = height / (127420 / 2);
+	float4 color = float4(interpolar, 0.1, 0.5 - interpolar, 1.0);
+
+	if (interpolar < 0.1 && interpolar > 0.02) {
+		return float4(0.3 + interpolar, 0.2 + interpolar, 0.1, 1.0);
+	}
+	else if (interpolar <= 0.02 && interpolar > 0.002) {
+		return float4(interpolar * 50, 0.6, 0.5 - interpolar * 20, 1.0);
+	}
+	else if (interpolar < 0.002 && interpolar > 0.0001) {
+		return float4(0.3 + interpolar * 100, 0.2 + interpolar * 100, 0.4, 1.0);
+	}
+	else if (interpolar <= 0.0001) {
+		return float4(interpolar * 500, 0.6, 0.5 - interpolar * 200, 1.0);
+	}
+	return color;
+}
+
+
+fixed4 FS(GM_OUTPUT i, uint instanceID : SV_InstanceID) : SV_Target
 {
 	float3 n = normalize(float3(i.wordPosition.x, i.wordPosition.y, i.wordPosition.z));
 	float uCoor = atan2(n.z, n.x) / (2 * PI) + 0.5f;
@@ -55,46 +81,17 @@ fixed4 FS(GM_OUTPUT i) : SV_Target
 	float dist = distance(_CameraPosition, float3(0, 0, 0)) - _PlanetInfo.x;
 	fixed4 c;
 	float uCoor2;
-	float spectrum = tex2D(_SpecMap,float2(uCoor, vCoor)).r;
-	float height = i.height;
-	c = tex2Dlod(_MainTex, float4(uCoor, vCoor, 0.0, 0));
+	float spectrum = tex2D(_SpecularMap,float2(uCoor, vCoor)).r;
+	c = tex2Dlod(_PlanetTextures, float4(uCoor, vCoor, 0.0, 0));
 
-	if (dist < float(_PlanetInfo.x)  * 0.2f) {
-		float ii = 1;
+	float3 calc;
 
-	/*	int index = 0;
-
-		for (int o = 0; o < _TexturesArrayLength; o++) {
-			if (1 - i.height >= _TexturesArray[o]) {
-				index = o;
-				break;
-			}
-		}*/
-
-		if (dist < float(_PlanetInfo.x)  * 0.05f) {
-			ii = 0.6f;
-		}
-		else {
-			ii = ((dist - float(_PlanetInfo.x)  * 0.05f) * 0.4f) / (float(_PlanetInfo.x)  * 0.15f) + 0.6f;
-		} 
-
-
-		if (c.x < 0.2 && c.y > 0.2 && c.z < 0.2) {
-
-			c = lerp(UNITY_SAMPLE_TEX2DARRAY(_SurfaceTexture, float3(float2(uCoor * _PlanetInfo.y, vCoor * _PlanetInfo.y), 0)), c, ii);
-		}
-		else if (i.height < 0.2f) {
-			c = lerp(UNITY_SAMPLE_TEX2DARRAY(_SurfaceTexture, float3(float2(uCoor * _PlanetInfo.y, vCoor * _PlanetInfo.y), 0)), c, ii);
-		}
-		else if (c.x > 0.6 && c.y > 0.6 && c.z > 0.6) {
-			c = lerp(UNITY_SAMPLE_TEX2DARRAY(_SurfaceTexture, float3(float2(uCoor * _PlanetInfo.y, vCoor * _PlanetInfo.y), 3)), c, ii);
-		}
-		else if (c.y - c.x > 5 && c.z < 0.6) {
-			c = lerp(UNITY_SAMPLE_TEX2DARRAY(_SurfaceTexture, float3(float2(uCoor * _PlanetInfo.y, vCoor * _PlanetInfo.y), 3)), c, ii);
-		}
+	if (_IsLODActive == 1) {
+		calc = calcColor2(i, ShowLODSystem(i.height));
+	}
+	else {
+		calc = calcColor2(i, c.xyz);
 	}
 
-	float3 calc = calcColor2(i, c.xyz);
-
-	return float4(calc, 1.0);
+	return float4(c.xyz * 2, 1.0);
 }

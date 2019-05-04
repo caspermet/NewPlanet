@@ -8,8 +8,6 @@ float _FlipNoise;
 float _noiseHeight;
 float _rotate;
 float _textureblend;
-int _TexturesArrayLength;
-float _TexturesArray[20];
 
 /**************
 water
@@ -35,8 +33,10 @@ Variablec from scripts
 
 float3 _CameraPosition;
 sampler2D _noiseTexture;
+sampler2D _SpecularMap;
 float fHdrExposure;
 float _Gamma;
+int _IsLODActive;
 
 
 /**********************
@@ -50,15 +50,20 @@ StructuredBuffer<float4> directionsBuffer2;
 /********************
 HeightMap textures
 ************************/
+sampler2D _PlanetTextures;
+/*
 UNITY_DECLARE_TEX2DARRAY(_PlanetHeightMapTop);
-UNITY_DECLARE_TEX2DARRAY(_PlanetHeightMapBottom);
+UNITY_DECLARE_TEX2DARRAY(_PlanetHeightMapBottom);*/
 
 /*********************************
-Planet Textures in fragment shader
+Planet Textures in fragment shade
 *******************************/
+sampler2D _PlanetHeightMap;
+
+/*
 UNITY_DECLARE_TEX2DARRAY(_PlanetTexturesTop);
 UNITY_DECLARE_TEX2DARRAY(_PlanetTexturesBottom);
-UNITY_DECLARE_TEX2DARRAY(_SurfaceTexture);
+UNITY_DECLARE_TEX2DARRAY(_SurfaceTexture);*/
 
 /*****************************************************************
 Planet Info
@@ -85,6 +90,7 @@ struct VS_OUTPUT
 {
 	float4 vertex : INTERNALTESSPOS;
 	float3 normal : NORMAL;
+	float3 normal2 : NORMAL2;
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
 	float tess : TEXCOORD2;
@@ -95,6 +101,7 @@ struct HS_OUTPUT
 {
 	float4 vertex : INTERNALTESSPOS;
 	float3 normal : NORMAL;
+	float3 normal2 : NORMAL2;
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
 	float tess : TEXCOORD2;
@@ -105,6 +112,7 @@ struct DS_OUTPUT
 {
 	float4 vertex : POSITION;
 	float3 normal : NORMAL;
+	float3 normal2 : NORMAL2;
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
 	float height : TEXCOORD2;
@@ -113,6 +121,7 @@ struct GM_OUTPUT
 {
 	float4 vertex : POSITION;
 	float3 normal : NORMAL;
+	float3 normal2 : NORMAL2;
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
 	float height : TEXCOORD2;

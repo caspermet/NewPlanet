@@ -1,135 +1,128 @@
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+﻿// Upgrade NOTE: replaced 'glstate.matrix.mvp' with 'UNITY_MATRIX_MVP'
 // Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "Planet/Atmosphere"
-{
-    Properties
-    {
-        _MainTex("Texture (RGB)", 2D) = "black" {}
-        _Color("Color", Color) = (0, 0, 0, 1)
-        _AtmoColor("Atmosphere Color", Color) = (0.5, 0.5, 1.0, 1)
-        _Size("Size", Float) = 0.1
-        _Falloff("Falloff", Float) = 5
-        _FalloffPlanet("Falloff Planet", Float) = 5
-        _Transparency("Transparency", Float) = 15
-        _TransparencyPlanet("Transparency Planet", Float) = 1
-    }
-   
-	SubShader
-    {
-        Pass
-        {
-            Name "PlanetBase"
-            Tags {"LightMode" = "Always"}
-            Cull Back
-           
-            CGPROGRAM
-                #pragma vertex vert
-                #pragma fragment frag
-               
-                #pragma fragmentoption ARB_fog_exp2
-                #pragma fragmentoption ARB_precision_hint_fastest
-               
-                #include "UnityCG.cginc"
-               
-                uniform sampler2D _MainTex;
-                uniform float4 _MainTex_ST;
-                uniform float4 _Color;
-                uniform float4 _AtmoColor;
-                uniform float _FalloffPlanet;
-                uniform float _TransparencyPlanet;
-               
-                struct v2f
-                {
-                    float4 pos : SV_POSITION;
-                    float3 normal : TEXCOORD0;
-                    float3 worldvertpos : TEXCOORD1;
-                    float2 texcoord : TEXCOORD2;
-                };
+Shader "AtmosphereFromEarth" {
+	Properties{
+	  _v4CameraPos("Camera Position",Vector) = (0,0,0,0)
+	  _v4LightDir("Light Direction",Vector) = (0,0,0,0)
+	  _cInvWaveLength("Inverse WaveLength",Color) = (0,0,0,0)
+	  _fCameraHeight("Camera Height",Float) = 0
+	  _fCameraHeight2("Camera Height2",Float) = 0
+	  _fOuterRadius("Outer Radius",Float) = 0
+	  _fOuterRadius2("Outer Radius 2",Float) = 0
+	  _fInnerRadius("Inner Radius",Float) = 0
+	  _fInnerRadius2("Inner Radius 2",Float) = 0
+	  _fKrESun("KrESun",Float) = 0
+	  _fKmESun("KmESun",Float) = 0
+	  _fKr4PI("Kr4PI",Float) = 0
+	  _fKm4PI("Km4PI",Float) = 0
+	  _fScale("Scale",Float) = 0
+	  _fScaleDepth("Scale Depth",Float) = 0
+	  _fScaleOverScaleDepth("Scale Over Scale Depth",Float) = 0
+	  _Samples("Samples",Float) = 0
+	  _G("G",Float) = 0
+	  _G2("G2",Float) = 0
+	}
+		SubShader{
+		  Tags {"Queue" = "Transparent" }
+		  Pass {
+			Cull Front
+			Blend One One
 
-                v2f vert(appdata_base v)
-                {
-                    v2f o;
-                   
-                    o.pos = UnityObjectToClipPos (v.vertex);
-                    o.normal = v.normal;
-                    o.worldvertpos = mul(unity_ObjectToWorld, v.vertex).xyz;
-                    o.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
-                   
-                    return o;
-                }
-              
-                float4 frag(v2f i) : COLOR
-                {
-                    i.normal = normalize(i.normal);
-                    float3 viewdir = normalize(_WorldSpaceCameraPos-i.worldvertpos);
-                   
-                    float4 atmo = _AtmoColor;
-                    atmo.a = pow(1.0-saturate(dot(viewdir, i.normal)), _FalloffPlanet);
-                    atmo.a *= _TransparencyPlanet*_Color;
-               
-                    float4 color = tex2D(_MainTex, i.texcoord)*_Color;
-                    color.rgb = lerp(color.rgb, atmo.rgb, atmo.a);
-               
-                    return color*dot(normalize(i.worldvertpos-_WorldSpaceLightPos0), i.normal);
-                }
-            ENDCG
-        }
-   
-        Pass
-        {
-            Name "AtmosphereBase"
-            Tags {"LightMode" = "Always"}
-            Cull Front
-            Blend SrcAlpha One
-           
-            CGPROGRAM
-                #pragma vertex vert
-                #pragma fragment frag
-               
-                #pragma fragmentoption ARB_fog_exp2
-                #pragma fragmentoption ARB_precision_hint_fastest
-               
-                #include "UnityCG.cginc"
-               
-                uniform float4 _Color;
-                uniform float4 _AtmoColor;
-                uniform float _Size;
-                uniform float _Falloff;
-                uniform float _Transparency;
-               
-                struct v2f
-                {
-                    float4 pos : SV_POSITION;
-                    float3 normal : TEXCOORD0;
-                    float3 worldvertpos : TEXCOORD1;
-                };
+	CGPROGRAM
+	#pragma vertex vert
+	#pragma fragment frag
+	#include "UnityCG.cginc"
 
-                v2f vert(appdata_base v)
-                {
-                    v2f o;
-                   
-                    v.vertex.xyz += v.normal*_Size;
-                    o.pos = UnityObjectToClipPos (v.vertex);
-                    o.normal = v.normal;
-                    o.worldvertpos = mul(unity_ObjectToWorld, v.vertex);
-                   
-                    return o;
-                }
-              
-                float4 frag(v2f i) : COLOR
-                {
-                    i.normal = normalize(i.normal);
-                    float3 viewdir = normalize(i.worldvertpos-_WorldSpaceCameraPos);
-                   
-                    float4 color = _AtmoColor;
-                    color.a = pow(saturate(dot(viewdir, i.normal)), _Falloff);
-                    color.a *= _Transparency*_Color*dot(normalize(i.worldvertpos-_WorldSpaceLightPos0), i.normal);
-                    return color;
-                }
-            ENDCG
-        }
-    }
-   
-    FallBack "Diffuse"
+	float4 _v4CameraPos;
+	float4 _v4LightDir;
+	float4 _cInvWaveLength;
+	float _fCameraHeight;
+	float _fCameraHeight2;
+	float _fOuterRadius;
+	float _fOuterRadius2;
+	float _fInnerRadius;
+	float _fInnerRadius2;
+	float _fKrESun;
+	float _fKmESun;
+	float _fKr4PI;
+	float _fKm4PI;
+	float _fScale;
+	float _fScaleDepth;
+	float _fScaleOverScaleDepth;
+	float _Samples;
+	float _G;
+	float _G2;
+
+	struct v2f {
+	  float4 position : POSITION;
+	  float3 c0 : COLOR0;
+	  float3 c1 : COLOR1;
+	  float3 t0 : TEXCOORD0;
+	};
+
+
+	float expScale(float cos) {
+		float x = 1 - cos;
+		return _fScaleDepth * exp(-0.00287 + x * (0.459 + x * (3.83 + x * (-6.80 + x * 5.25))));
+	}
+
+	v2f vert(float4 vertex : POSITION) {
+	float3 lightDirection = normalize(_WorldSpaceLightPos0.xyz);
+	_v4LightDir = float4(lightDirection,1);
+	  float3 v3Pos = vertex.xyz;
+	  float3 v3Ray = v3Pos - _v4CameraPos.xyz;
+	  float fFar = length(v3Ray);
+	  v3Ray /= fFar;
+
+	  // Calculate the ray's starting position, then calculate its scattering offset
+	 float3 v3Start = v3Pos;
+	 float v3StartAngle = dot(v3Ray,v3Start) / _fOuterRadius;
+	 float v3StartDepth = exp(_fScaleOverScaleDepth * (_fInnerRadius - _fCameraHeight));
+	 float v3StartOffset = v3StartDepth * expScale(v3StartAngle);
+
+	   float fSampleLength = fFar / _Samples;
+	   float fScaledLength = fSampleLength * _fScale;
+	   float3 sampleRay = v3Ray * fSampleLength;
+	   float3 samplePoint = v3Start + sampleRay * 0.5f;
+
+	   float3 frontColor = float3(0,0,0);
+	   float3 attenuate;
+
+	   for (int i = 0; i < 1; i++) {
+		 float height = length(samplePoint);
+		 float depth = exp(_fScaleOverScaleDepth * (_fInnerRadius - height));
+		 float lightAngle = dot(_v4LightDir.xyz, samplePoint) / height;
+		 float cameraAngle = dot(-v3Ray, samplePoint) / height;
+		 float scatter = (v3StartOffset + depth * (expScale(lightAngle) - expScale(cameraAngle)));
+
+		 attenuate = exp(-scatter * (_cInvWaveLength.xyz * _fKr4PI + _fKm4PI));
+		 frontColor += attenuate * (depth * fScaledLength);
+		 samplePoint += sampleRay;
+	   }
+
+	   v2f OUT;
+	   OUT.position = UnityObjectToClipPos(vertex);
+	   OUT.t0 = _v4CameraPos.xyz - vertex.xyz;
+	   OUT.c0.rgb = frontColor * (_cInvWaveLength.xyz * _fKrESun);
+	   OUT.c1.rgb = frontColor * _fKmESun;
+	   return OUT;
+	 }
+	////// SkyFromAtmos(Space) frag
+	float4 frag(v2f INPUT) : COLOR {
+	  float cos = dot(_v4LightDir.xyz, INPUT.t0) / length(INPUT.t0);
+	  float cos2 = cos * cos;
+	  float miePhase = 1.5 * ((1.0 - _G2) / (2.0 + _G2)) * (1.0 + cos2) / pow(1.0 + _G2 - 2.0*_G*cos, 1.5);
+	  float rayleighPhase = 0.75 * (1.0 + cos2);
+	  float4 fragColor;
+
+	  fragColor.xyz = (rayleighPhase * INPUT.c0) + (miePhase * INPUT.c1);
+	  fragColor.w = fragColor.z;
+	  return fragColor;
+	}
+
+	ENDCG
+		  }
+	}
+		FallBack "None"
 }

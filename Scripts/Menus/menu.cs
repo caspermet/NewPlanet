@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -7,27 +8,11 @@ public class menu : MonoBehaviour
     public GameObject mainMenuHolder;
     public GameObject optionsMenuHolder;
 
-    public Slider radiusSlider;
-
-  /*  void Update()
-    {
-        if (Input.GetKey(KeyCode.Escape))
-        {
-            Scene currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-            if (currentScene.name == "menu")
-            {       
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Scenesnew");
-            }
-            else
-            {
-                UnityEngine.SceneManagement.SceneManager.LoadScene("menu");
-            }
-        }
-    }*/
+    public float value;
 
     public void Play()
     {
-        MenuData.PlanetRadius = 40;
+        MenuData.PlanetRadius = value;
         UnityEngine.SceneManagement.SceneManager.LoadScene("Scenesnew");
     }
 
@@ -36,9 +21,10 @@ public class menu : MonoBehaviour
         Application.Quit();
     }
 
-    public void SetRadiusOfPlanet(float value)
+    public void SetRadiusOfPlanet(float valuee)
     {
-
+        Debug.Log(valuee);
+      // this.value = valuee;
     }
 
 

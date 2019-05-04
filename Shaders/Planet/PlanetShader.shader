@@ -21,7 +21,7 @@
 		_TessMax("Tessellation", Range(1,5)) = 1
 		_rotate("rotate", Range(0,360)) = 0
 
-		_textureblend("bluer Texture", Range(0,0.1)) = 1
+		_textureblend("bluer Texture", Range(0,10)) = 1
 
 
 			/**********************

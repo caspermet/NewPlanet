@@ -165,7 +165,7 @@ Material:
     - _tY: 0
     - _tZ: 0
     - _textureProfil: 44.74
-    - _textureblend: 0.0648
+    - _textureblend: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _ColorA: {r: 1, g: 1, b: 1, a: 1}

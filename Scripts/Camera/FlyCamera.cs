@@ -87,11 +87,6 @@ public class FlyCamera
             camera.transform.position += camera.transform.right * normalMoveSpeed * Input.GetAxis("Horizontal") * Time.deltaTime;
         }
 
-        if (Input.GetKey(KeyCode.Z))
-            sun.Rotate(new Vector3(0, sunRotSpeed * Time.deltaTime, 0));
-        else if (Input.GetKey(KeyCode.C))
-            sun.Rotate(new Vector3(0, -sunRotSpeed * Time.deltaTime, 0));
-
 
 
         if (Input.GetKeyDown(KeyCode.End))

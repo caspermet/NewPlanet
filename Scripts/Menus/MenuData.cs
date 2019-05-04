@@ -4,10 +4,10 @@ using UnityEngine;
 
 public static class MenuData
 {
-    private static int planetRadius;
+    private static float planetRadius;
     private static bool isPause;
 
-    public static int PlanetRadius
+    public static float PlanetRadius
     {
         get
         {

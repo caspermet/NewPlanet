@@ -7,7 +7,7 @@ public static class FrustumCulling
 
     public static bool Frustum(Camera camera, Vector3 position, float scale, Vector3 normal)
     {
-        float maxHeight = 1000;
+        float maxHeight = PlanetData.MaxPlanetHeight;   
         Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
         for (int i = 0; i < planes.Length; i++)
         {  
