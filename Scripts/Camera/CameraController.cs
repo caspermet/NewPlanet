@@ -35,7 +35,7 @@ public class CameraController
 
         if (Input.GetKeyDown(KeyCode.T))
         {
-            PlanetData.isLODActive = !PlanetData.isLODActive;
+            PlanetData.IsLODActive = !PlanetData.IsLODActive;
         }
 
 
@@ -56,5 +56,11 @@ public class CameraController
         {
             camera.nearClipPlane = 30;
         }
+    }
+
+    public void setDistance(float distance)
+    {
+        this.distance = distance;
+        flyCamera.SetPlanetRadius(distance);
     }
 }

@@ -10,10 +10,10 @@ public class ChunkFace
 
     private int chunkSize;
     private float scale;
-    private float radius;
     private int level;
 
     private Vector3 position;
+    private Vector3 oldPosition;
     private Vector4 positionToDraw;
     private Camera camera;
 
@@ -39,44 +39,48 @@ public class ChunkFace
 
     private ChunkFace[] topLevelneighbor;
 
+    private Vector3 stepLeft;
+    private Vector3 stepUp;
+    private Vector3[] steps;
+    bool isMerge;
+
     int topNeighbor;
     int rightNeighbor;
     int bottomNeighbor;
     int leftNeighbor;
 
 
-    public ChunkFace(ChunkFace parent, Vector3 position, float scale, Camera viewer, Vector4 directionX, Vector3 directionY, float radius, bool isVisible, int level, int[] myDirection)
+    public ChunkFace(ChunkFace parent, Vector3 position, float scale, Camera viewer, Vector4 directionX, Vector3 directionY,  bool isVisible, int level, int[] myDirection)
     {
-        initialization(parent, position, scale, viewer, directionX, directionY, radius, isVisible, level, myDirection);
+        initialization(parent, position, scale, viewer, directionX, directionY, isVisible, level, myDirection);
     }
 
-    private void initialization(ChunkFace parent, Vector3 position, float scale, Camera viewer, Vector4 directionX, Vector3 directionY, float radius, bool isVisible, int level, int[] myDirection)
+    private void initialization(ChunkFace parent, Vector3 position, float scale, Camera viewer, Vector4 directionX, Vector3 directionY,  bool isVisible, int level, int[] myDirection)
     {
 
         this.parentChunk = parent;
         this.position = position;
+        this.oldPosition = position;
         this.scale = scale;
 
         this.directionX = directionX;
         this.directionY = directionY;
-        this.radius += radius;
         this.camera = viewer;
         this.level = level;
         this.myDirection = myDirection;
-
+        isMerge = false;
         this.isVisible = isVisible;
         chunkTree = null;
         InitLists();
         generated = true;
+
         Vector3 newPosition = CalculePositionOfSphere(position);
-
-        normal = newPosition.normalized;
-
         bounds = new Bounds(newPosition, newPosition.normalized * scale);
-
         positionToDraw = new Vector4((position.x), (position.y), (position.z), scale);
 
-        Update(viewer.transform.position, isVisible);
+        RecalculSteps();
+
+        Update(viewer.transform.position, isVisible, position, scale);
     }
 
     private void InitLists()
@@ -90,29 +94,43 @@ public class ChunkFace
 
     private Vector3 CalculePositionOfSphere(Vector3 position)
     {
-        float x = position.x / radius;
-        float y = position.y / radius;
-        float z = position.z / radius;
+        float x = position.x / PlanetData.PlanetRadius ;
+        float y = position.y / PlanetData.PlanetRadius ;
+        float z = position.z / PlanetData.PlanetRadius ;
 
         float dx = x * Mathf.Sqrt(1.0f - (y * y * 0.5f) - (z * z * 0.5f) + (y * y * z * z / 3.0f));
         float dy = y * Mathf.Sqrt(1.0f - (z * z * 0.5f) - (x * x * 0.5f) + (z * z * x * x / 3.0f));
         float dz = z * Mathf.Sqrt(1.0f - (x * x * 0.5f) - (y * y * 0.5f) + (x * x * y * y / 3.0f));
 
-        return new Vector3(dx, dy, dz) * radius;
+        return new Vector3(dx, dy, dz) * PlanetData.PlanetRadius;
     }
 
-    public void Update(Vector3 viewerPositon, bool isStillVisible, float newScale)
+    public void Update(Vector3 viewerPositon, bool isStillVisible, Vector3 positionA, float newScale)
     {
+
+        if (positionA != position)
+        {
+            scale = newScale;
+            position = positionA;
+            Vector3 newPosition = CalculePositionOfSphere(positionA);
+            bounds.center = newPosition;
+            bounds.size = newPosition.normalized * scale;
+            RecalculSteps();
+
+            positionToDraw = new Vector4((position.x), (position.y), (position.z), scale);
+        }
+
+
         if (isStillVisible)
         {
-            isVisible = FrustumCulling.Frustum(camera, bounds.center, scale * 0.5f, normal);
+            isVisible = FrustumCulling.Frustum(camera, bounds.center, scale * 0.5f);
         }
 
         if (!isVisible)
         {
             return;
         }
-
+ 
         var dist = Vector3.Distance(viewerPositon, bounds.ClosestPoint(viewerPositon));
         this.viewerPositon = viewerPositon;
         SetNeighborToNull();
@@ -125,23 +143,28 @@ public class ChunkFace
             {
 
                 parentChunk.MergeChunk();
+                isMerge = true;
                 return;
             }
+
         }
 
         if (chunkTree != null)
         {
+            int i = 0;
             foreach (var item in chunkTree)
             {
-                item.Update(viewerPositon, isVisible);
+                item.Update(viewerPositon, isVisible, steps[i], scale * 0.5f);      
+                i++;
+               
             }
+
         }
         else if (scale * 2 > dist)
         {
             SubDivide(viewerPositon);
         }
 
-        //   Debug.Log(level);
         return;
     }
 
@@ -151,6 +174,20 @@ public class ChunkFace
         rightNeighbor = 2;
         bottomNeighbor = 2;
         leftNeighbor = 2;
+    }
+
+    private void RecalculSteps()
+    {
+        stepLeft = (new Vector3(directionX.x, directionX.y, directionX.z) * scale / 4);
+        stepUp = (directionY * scale / 4);
+        steps = null;
+        steps = new Vector3[]
+        {
+            position - stepLeft + stepUp,
+            position + stepLeft + stepUp,
+            position - stepLeft - stepUp,
+            position + stepLeft - stepUp
+        };
     }
 
     public void GetPosition2()
@@ -175,7 +212,7 @@ public class ChunkFace
 
 
 
-        int suma = 0;// (int)(edge.x + edge.y + edge.z + edge.w);
+        int suma = (int)(edge.x + edge.y + edge.z + edge.w);
         rotate = CalculRotate.CalculRotateOfMesh(edge, suma);
 
         newDirection.w += rotate;
@@ -521,13 +558,12 @@ public class ChunkFace
         if (chunkTree == null)
             return;
 
-        for (int i = 0; i < chunkTree.Length; i++)
+        for (int i = 0; i < 4; i++)
         {
             chunkTree[i].MergeChunk();
         }
 
         chunkTree = null;
-
         ClearPositionAndDirection();
     }
 
@@ -538,20 +574,14 @@ public class ChunkFace
 
     public void SubDivide(Vector3 viewerPosition)
     {
-
         float newScale = scale * 0.5f;
 
-        Vector3 left = (new Vector3(directionX.x, directionX.y, directionX.z) * scale / 4);
-        Vector3 up = (directionY * scale / 4);
-
         chunkTree = new ChunkFace[] {
-                new ChunkFace(this, position - left  + up,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, new int[] {0,0 }),
-                new ChunkFace(this, position + left + up,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, new int[] {0,1}),
-                new ChunkFace(this, position - left - up,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, new int[] {1,0}),
-                new ChunkFace(this, position + left - up,  newScale, camera, directionX, directionY, radius, isVisible, level + 1, new int[] {1,1})
+                new ChunkFace(this, position - stepLeft  + stepUp,  newScale, camera, directionX, directionY, isVisible, level + 1, new int[] {0,0 }),
+                new ChunkFace(this, position + stepLeft + stepUp,  newScale, camera, directionX, directionY, isVisible, level + 1, new int[] {0,1}),
+                new ChunkFace(this, position - stepLeft - stepUp,  newScale, camera, directionX, directionY, isVisible, level + 1, new int[] {1,0}),
+                new ChunkFace(this, position + stepLeft - stepUp,  newScale, camera, directionX, directionY, isVisible, level + 1, new int[] {1,1})
             };
-
-
     }
 
     public bool GetGenerate()

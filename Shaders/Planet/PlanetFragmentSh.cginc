@@ -22,7 +22,7 @@ void geom(triangle DS_OUTPUT IN[3], inout TriangleStream<GM_OUTPUT> tristream)
 float3 calcColor2(GM_OUTPUT input, float3 textureColor) {
 
 	float3 normalDirection = input.normal;
-	float3 normalDirection2 = input.normal2;
+	float3 normalDirection2 = input.normal;
 
 	float3 viewDirection = normalize(_WorldSpaceCameraPos - input.wordPosition.xyz);
 	float3 lightDirection = normalize(_WorldSpaceLightPos0.xyz);
@@ -32,9 +32,9 @@ float3 calcColor2(GM_OUTPUT input, float3 textureColor) {
 	float3 spec = _SpecColor.rgb * pow(max(0, dot(reflect(-lightDirection, normalDirection), viewDirection)), _Shininess);
 
 	// DIFFUSE + NORMAL
-	diff.x = diff.x < 0.1 ? 0.1 : diff.x;
-	diff.y = diff.y < 0.1 ? 0.1 : diff.y;
-	diff.z = diff.z < 0.1 ? 0.1 : diff.z;
+	diff.x = diff.x < 0.05 ? 0.05 : diff.x;
+	diff.y = diff.y < 0.05 ? 0.05 : diff.y;
+	diff.z = diff.z < 0.05 ? 0.05 : diff.z;
 
 	//diff =  lerp(diff, diff2, 0.5);
 
@@ -93,5 +93,5 @@ fixed4 FS(GM_OUTPUT i, uint instanceID : SV_InstanceID) : SV_Target
 		calc = calcColor2(i, c.xyz);
 	}
 
-	return float4(c.xyz * 2, 1.0);
+	return float4(calc, 1.0);
 }

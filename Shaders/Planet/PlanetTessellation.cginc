@@ -88,8 +88,8 @@ DS_OUTPUT DS(HS_CONSTANT_OUTPUT input, OutputPatch<HS_OUTPUT, 3> ip, float3 b : 
 	o.normal2 = ip[0].normal2*b.x + ip[1].normal2*b.y + ip[2].normal2*b.z;
 	o.height = ip[0].height*b.x + ip[1].height*b.y + ip[2].height*b.z;
 
-	float height = tex2Dlod(_PlanetHeightMap, float4(o.uv, 0.0, 0));
-	o.vertex = float4((o.normal * _PlanetInfo.x  + o.normal * (height * _PlanetInfo.y)),1.0);
+	/*float height = tex2Dlod(_PlanetHeightMap, float4(o.uv, 0.0, 0));
+	o.vertex = float4((o.normal * _PlanetInfo.x  + o.normal * (height * _PlanetInfo.y)),1.0);*/
 	o.vertex = UnityObjectToClipPos(o.vertex);
 	return o;
 }

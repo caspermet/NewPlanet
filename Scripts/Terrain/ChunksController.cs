@@ -63,7 +63,7 @@ public class ChunksController
 
         directions = new Vector4[]          { new Vector4(-1, 0, 0, 0),          new Vector4(1, 0, 0, 0),           new Vector4(0, 0, 1, 0),            new Vector4(0, 0, -1, 0),           new Vector4(1, 0, 0, 0),            new Vector4(-1, 0, 0, 0) };
         directionsY = new Vector3[]         { new Vector3(0, 1, 0),             new Vector3(0, 1, 0),               new Vector3(0, 1, 0),               new Vector3(0, 1, 0),               new Vector3(0, 0, 1),               new Vector3(0, 0, 1) };
-        planetRadiusArray = new Vector3[]   { new Vector3(0, 0, planetRadius),  new Vector3(0, 0, -planetRadius),   new Vector3(planetRadius, 0, 0),    new Vector3(-planetRadius, 0, 0),   new Vector3(0, planetRadius, 0),    new Vector3(0, -planetRadius, 0) };
+        SetPlanetRadiusArray(planetRadius);
 
         this.scale = scale;
         this.viewer = viewer.transform;
@@ -88,12 +88,14 @@ public class ChunksController
         drawMesh[1] = new DrawMeshInstanced(mesh);
         drawMesh[2] = new DrawMeshInstanced(mesh);
         drawMesh[3] = new DrawMeshInstanced(mesh);
+        Debug.Log(scale);
         UpdateChunkMesh();
     }
 
 
     public void Update(Material[] instanceMaterials, MaterialPropertyBlock materialBlock, float newMaxScale)
     {
+
         viewerPosition = new Vector3(viewer.position.x, viewer.position.y, viewer.position.z);
         viewerRotation = new Vector3(viewer.eulerAngles.x, viewer.eulerAngles.y, viewer.eulerAngles.z);
         this.instanceMaterials = instanceMaterials;
@@ -101,13 +103,17 @@ public class ChunksController
 
         if (viewerPositionOld != viewerPosition || viewerRotation != viewerRotationOld || newMaxScale != scale)
         {
-            scale = newMaxScale;
+            if(newMaxScale != scale)
+            {
+                scale = newMaxScale;
+                SetPlanetRadiusArray(newMaxScale / 2);              
+            }
+            
             viewerPositionOld = viewerPosition;
             viewerRotationOld = viewerRotation;
 
             UpdateChunkMesh();
             viewedChunkCoord = positionsList.ToArray();
-
         }
 
         UpdateAllMesh();
@@ -115,17 +121,12 @@ public class ChunksController
 
     private void createChunkFaces()
     {
-      /*  for (int index = 0; index < 6; index++)
-        {
-            chunkFace[index] = new ChunkFace(null, planetRadiusArray[index], this.scale, camera, directions[index], directionsY[index], planetRadius, true, 0, null);
-        }*/
-
-        chunkFace[0] = new ChunkFace( null, planetRadiusArray[0], this.scale, camera, directions[0], directionsY[0], planetRadius, true, 0, null);
-        chunkFace[1] = new ChunkFace( null, planetRadiusArray[1], this.scale, camera, directions[1], directionsY[1], planetRadius, true, 0, null);
-        chunkFace[2] = new ChunkFace( null, planetRadiusArray[2], this.scale, camera, directions[2], directionsY[2], planetRadius, true, 0, null);
-        chunkFace[3] = new ChunkFace( null, planetRadiusArray[3], this.scale, camera, directions[3], directionsY[3], planetRadius, true, 0, null);
-        chunkFace[4] = new ChunkFace( null, planetRadiusArray[4], this.scale, camera, directions[4], directionsY[4], planetRadius, true, 0, null);
-        chunkFace[5] = new ChunkFace( null, planetRadiusArray[5], this.scale, camera, directions[5], directionsY[5], planetRadius, true, 0, null);
+        chunkFace[0] = new ChunkFace( null, planetRadiusArray[0], this.scale, camera, directions[0], directionsY[0],  true, 0, null);
+        chunkFace[1] = new ChunkFace( null, planetRadiusArray[1], this.scale, camera, directions[1], directionsY[1],  true, 0, null);
+        chunkFace[2] = new ChunkFace( null, planetRadiusArray[2], this.scale, camera, directions[2], directionsY[2],  true, 0, null);
+        chunkFace[3] = new ChunkFace( null, planetRadiusArray[3], this.scale, camera, directions[3], directionsY[3],  true, 0, null);
+        chunkFace[4] = new ChunkFace( null, planetRadiusArray[4], this.scale, camera, directions[4], directionsY[4],  true, 0, null);
+        chunkFace[5] = new ChunkFace( null, planetRadiusArray[5], this.scale, camera, directions[5], directionsY[5],  true, 0, null);
 
         chunkFace[0].UpdateTopNeighbor(new ChunkFace[] { chunkFace[4], chunkFace[3], chunkFace[5], chunkFace[2] });
         chunkFace[1].UpdateTopNeighbor(new ChunkFace[] { chunkFace[4], chunkFace[2], chunkFace[5], chunkFace[3] });
@@ -133,6 +134,12 @@ public class ChunksController
         chunkFace[3].UpdateTopNeighbor(new ChunkFace[] { chunkFace[4], chunkFace[1], chunkFace[5], chunkFace[0] });
         chunkFace[4].UpdateTopNeighbor(new ChunkFace[] { chunkFace[0], chunkFace[2], chunkFace[1], chunkFace[3] });
         chunkFace[5].UpdateTopNeighbor(new ChunkFace[] { chunkFace[0], chunkFace[2], chunkFace[1], chunkFace[3] });
+    }
+
+    public void SetPlanetRadiusArray(float newPlanetRadius)
+    {
+        planetRadiusArray = null;
+        planetRadiusArray = new Vector3[] { new Vector3(0, 0, newPlanetRadius), new Vector3(0, 0, -newPlanetRadius), new Vector3(newPlanetRadius, 0, 0), new Vector3(-newPlanetRadius, 0, 0), new Vector3(0, newPlanetRadius, 0), new Vector3(0, -newPlanetRadius, 0) };
     }
 
     private void InitLists()
@@ -149,15 +156,13 @@ public class ChunksController
 
         for (int i =0; i < cubeSize; i++)
         {
-
-            chunkFace[i].Update(viewerPosition, true, scale);
-        }
-       
+            chunkFace[i].Update(viewerPosition, true, planetRadiusArray[i], PlanetData.PlanetDiameter);
+        }     
 
         ClearPositionAndDirection();
 
         InitLists();
-
+     
         for (int i = 0; i < cubeSize; i++)
         {
             List<Vector4>[] pom;
@@ -197,7 +202,7 @@ public class ChunksController
     }
 
     private void UpdateAllMesh()
-    {
+    {     
 
         for (int i = 0; i < 4; i++)
         {

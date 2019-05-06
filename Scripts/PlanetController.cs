@@ -31,17 +31,20 @@ public class PlanetController : MonoBehaviour
     private CameraController cameraController;
     private MaterialPropertyBlock materialBlock;
 
+    public Texture2D normalMaps;
+
     void Start()
     {
-        planetInfo.x = maxScale / 2;
+        planetInfo.x = PlanetData.PlanetRadius;
         planetInfo.y = maxTerrainHeight;
-        PlanetData.PlanetRadius = planetInfo.x;
-        PlanetData.MaxPlanetHeight = planetInfo.y;
+        // PlanetData.PlanetRadius = planetInfo.x;
+        //PlanetData.MaxPlanetHeight = planetInfo.y;
+       // normalMaps = CreateNormalMap.NormalMap(planetHeightMap, 1);
 
-        cameraController = new CameraController(camera, maxScale / 2);
+        cameraController = new CameraController(camera, PlanetData.PlanetRadius);
 
         SetMaterialProperties();
-        chunk = new ChunksController(maxScale, chunkSize, instanceMaterials, camera, materialBlock);
+        chunk = new ChunksController(PlanetData.PlanetDiameter, chunkSize, instanceMaterials, camera, materialBlock);
     }
 
     void SetMaterialProperties()
@@ -52,6 +55,7 @@ public class PlanetController : MonoBehaviour
         materialBlock.SetTexture("_PlanetTextures", planetTexture);
         materialBlock.SetTexture("_PlanetHeightMap", planetHeightMap);
         materialBlock.SetTexture("_PlanetSpecular", planetSpecular);
+       // materialBlock.SetTexture("_PlanetNormalMap", normalMaps);
 
         materialBlock.SetTexture("_noiseTexture", PerlingNoise.CreateNoise((int)width, noise));
 
@@ -71,12 +75,14 @@ public class PlanetController : MonoBehaviour
 
     void Update()
     {
+        planetInfo.x = PlanetData.PlanetRadius;
+        cameraController.setDistance(PlanetData.PlanetRadius);
         materialBlock.SetVector("_CameraPosition", camera.transform.position);
         materialBlock.SetInt("_IsLODActive", (PlanetData.IsLODActive == false ? 0 : 1));
         materialBlock.SetVector("_PlanetInfo", planetInfo);
 
         cameraController.cameraUpdate();
-        chunk.Update(instanceMaterials, materialBlock, maxScale);
+        chunk.Update(instanceMaterials, materialBlock, PlanetData.PlanetDiameter); 
     }
 
     void OnDisable()

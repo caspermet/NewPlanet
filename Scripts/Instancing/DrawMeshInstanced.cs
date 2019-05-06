@@ -54,14 +54,14 @@ public class DrawMeshInstanced  {
 
         positionBuffer.SetData(positions);
    
-        MaterialPropertyBlock.SetBuffer("positionBuffer2", positionBuffer);
+        MaterialPropertyBlock.SetBuffer("positionBuffer", positionBuffer);
         if (directionBuffer != null)
             directionBuffer.Release();
         directionBuffer = new ComputeBuffer(instanceCount, 16);
 
         directionBuffer.SetData(directions);
       
-        MaterialPropertyBlock.SetBuffer("directionsBuffer2", directionBuffer);
+        MaterialPropertyBlock.SetBuffer("directionsBuffer", directionBuffer);
 
         // Indirect args
         if (instanceMesh != null)

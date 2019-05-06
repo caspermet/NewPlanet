@@ -5,7 +5,7 @@ using UnityEngine;
 public static class FrustumCulling 
 {
 
-    public static bool Frustum(Camera camera, Vector3 position, float scale, Vector3 normal)
+    public static bool Frustum(Camera camera, Vector3 position, float scale)
     {
         float maxHeight = PlanetData.MaxPlanetHeight;   
         Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);

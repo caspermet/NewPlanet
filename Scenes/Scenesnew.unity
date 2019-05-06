@@ -205,6 +205,7 @@ GameObject:
   - component: {fileID: 431095063}
   - component: {fileID: 431095062}
   - component: {fileID: 431095065}
+  - component: {fileID: 431095066}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -279,6 +280,17 @@ Behaviour:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 431095061}
   m_Enabled: 1
+--- !u!114 &431095066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 431095061}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77cd8edd3b1571f458d336256a4d4f7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &577068453
 GameObject:
   m_ObjectHideFlags: 0
@@ -440,6 +452,8 @@ GameObject:
   - component: {fileID: 837509110}
   - component: {fileID: 837509112}
   - component: {fileID: 837509113}
+  - component: {fileID: 837509114}
+  - component: {fileID: 837509115}
   m_Layer: 0
   m_Name: ScenaManager
   m_TagString: Untagged
@@ -501,6 +515,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pauseMenuUI: {fileID: 2083947792}
   isPaused: 0
+--- !u!114 &837509114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 837509109}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77cd8edd3b1571f458d336256a4d4f7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &837509115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 837509109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d40039d8c068eb043b8901228b83206c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  planetRotSpeed: 1
+  sunRotSpeed: 1
+  sun: {fileID: 0}
+  planets:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  Height: 5
 --- !u!1 &948456182
 GameObject:
   m_ObjectHideFlags: 0

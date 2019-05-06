@@ -44,8 +44,6 @@ buffery for instancing
 ***************/
 StructuredBuffer<float4> positionBuffer;
 StructuredBuffer<float4> directionsBuffer;
-StructuredBuffer<float4> positionBuffer2;
-StructuredBuffer<float4> directionsBuffer2;
 
 /********************
 HeightMap textures
@@ -59,6 +57,7 @@ UNITY_DECLARE_TEX2DARRAY(_PlanetHeightMapBottom);*/
 Planet Textures in fragment shade
 *******************************/
 sampler2D _PlanetHeightMap;
+sampler2D _PlanetNormalMap;
 
 /*
 UNITY_DECLARE_TEX2DARRAY(_PlanetTexturesTop);

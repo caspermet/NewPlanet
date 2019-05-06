@@ -11,53 +11,6 @@ float3 CalcUVFromHM(float3 position, float2 uvCoor, float3 normPosition, float h
 	
 	worldPosition = (position.xyz + normPosition * (height * _PlanetInfo.y));
 
-/*	if (dist > _PlanetInfo.x * 0.5) {
-		worldPosition = (position.xyz + normPosition * (tex2Dlod(_HeightTex, float4(uvCoor, 0.0, 0)) * _PlanetInfo.y));
-	}
-	else {
-		float uMap = uvCoor.x * 4;
-		int vMap = int(uvCoor.y >= 0.5f ? 1 : 0);
-
-		int xindex = int(uMap);
-
-		int index = xindex;// +(uvCoor.y >= 0.5f ? 0 : 4);
-
-		float uCoor2 = (uvCoor.x * 4 - (float(xindex)));
-		float vCoor2 = (uvCoor.y - float(vMap) * 0.5f) * 2;
-		uCoor2 = uCoor2 < 0 ? 0 : uCoor2;
-		uCoor2 = uCoor2 > 1 ? 1 : uCoor2;
-		vCoor2 = vCoor2 > 1 ? 1 : vCoor2;
-		vCoor2 = vCoor2 < 0 ? 0 : vCoor2;
-
-		/*if (uCoor2 >= 0.998) {
-			uCoor2 = 0.997;
-		}
-		if (vCoor2 >= 0.998) {
-			vCoor2 = 0.997;
-		}
-		if (uCoor2 <= 0.001) {
-			uCoor2 = 0.002;
-		}
-		if (vCoor2 <= 0.001) {
-			vCoor2 = 0.002;
-		}
-
-		float4 c;
-		if (uvCoor.y >= 0.5f) {
-			c = UNITY_SAMPLE_TEX2DARRAY_LOD(_PlanetHeightMapTop, float3(uCoor2, vCoor2, index ), 0);
-		}
-		else {		
-			c = UNITY_SAMPLE_TEX2DARRAY_LOD(_PlanetHeightMapBottom, float3(uCoor2, vCoor2, index), 0);
-		}
-
-		if (_FlipNoise == 1 && c.y > _noiseHeight) {
-			//noiseValue = tex2Dlod(_noiseTexture, float4(uvCoor.x * _Tesss, uvCoor.y * _Tesss, 0.0, 0)) * _Tess;
-		}
-	
-
-		worldPosition = (position.xyz + normPosition * (c.xyz + noiseValue.xyz) * _PlanetInfo.y);
-	}*/
-
 	return worldPosition;
 }
 
@@ -100,7 +53,7 @@ float3 calculateNormal(float3 vertex, float scale)
 float3 filterNormalLod(float4 uv, float scale, float3 normal)
 {
 	float4 h;
-	float texelSize = 0.000001;
+	float texelSize = 0.00001;
 
 	h[0] = tex2Dlod(_PlanetHeightMap, uv + float4(texelSize * float2(0, -1), 0, 0)).x * _PlanetInfo.y;
 	h[1] = tex2Dlod(_PlanetHeightMap, uv + float4(texelSize * float2(-1, 0), 0, 0)).x *  _PlanetInfo.y;
@@ -112,7 +65,7 @@ float3 filterNormalLod(float4 uv, float scale, float3 normal)
 	n.x = h[1] - h[2];
 	n.y = 2; 
 
-	return   normalize(normalize(n) + normal * 2);
+	return   normalize(float3(0, 1, 0) - normalize(n) + normal);
 }
 
 
@@ -133,8 +86,8 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 {
 	VS_OUTPUT o;
 
-	float4 data = positionBuffer2[instanceID];
-	float4 transform = directionsBuffer2[instanceID];
+	float4 data = positionBuffer[instanceID];
+	float4 transform = directionsBuffer[instanceID];
 
 	v.vertex.xyz = mul(RotateAroundYInDegrees(_rotate), v.vertex.xyz);
 	float3 pos = v.vertex.xyz;
@@ -167,14 +120,15 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	else {
 		v.vertex.xyz = mul(RotateAroundYInDegrees(-transform.w ), v.vertex.xyz);
 	}
-	
+	if (data.x < 0) {
+		data.x = data.x - 500;
+	}
+	if (data.y < 0) {
+		data.y = data.y - 500;
+	}
 
 	float3 localPosition = v.vertex.xyz * data.w;
-	float3 worldPosition = data.xyz + localPosition;
-	float3 worldNormal = v.normal;
-
-	
-
+	float3 worldPosition = data.xyz + localPosition ;
 
 	float x = worldPosition.x / _PlanetInfo.x;;
 	float y = worldPosition.y / _PlanetInfo.x;;
@@ -186,7 +140,7 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 
 	o.normal = float3(dx, dy, dz);
 
-	worldPosition.xyz = float3(dx, dy, dz) * _PlanetInfo.x;
+	//worldPosition.xyz = float3(dx, dy, dz) * _PlanetInfo.x;
 
 
 
@@ -197,11 +151,13 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	float vCoor = asin(n.y) / PI + 0.5f; 
 	float tessellation = data.w;
 
-	//o.normal2 = filterNormalLod(uvlod, data.w, o.normal, worldPosition);
+//	o.normal2 = filterNormalLod(uvlod, data.w, o.normal, worldPosition);
 	o.normal2 = filterNormalLod(float4(uCoor, vCoor,0, 1.0), data.w, n);
 
-	float height = tex2Dlod(_PlanetHeightMap, float4(float2(uCoor, vCoor), 0.0, 0));
-	worldPosition.xyz = (worldPosition + n * (height * _PlanetInfo.y));
+	//o.normal2 = normalize(o.normal * 2 - tex2Dlod(_PlanetNormalMap, float4(float2(uCoor, vCoor), 0.0, 0)));
+
+	//float height = tex2Dlod(_PlanetHeightMap, float4(float2(uCoor, vCoor), 0.0, 0));
+	//worldPosition.xyz = (worldPosition + n * (height * _PlanetInfo.y));
 	
 	o.wordPosition = float4(worldPosition, 1.0f);
 	o.vertex = float4(worldPosition, 1.0f);

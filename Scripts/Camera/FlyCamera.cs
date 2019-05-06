@@ -56,6 +56,11 @@ public class FlyCamera
         }
     }
 
+    public void SetPlanetRadius(float radius)
+    {
+        planerRadius = radius;
+    }
+
     public void Update()
     {
         SetSpeedByDistance();
