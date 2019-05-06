@@ -120,15 +120,10 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	else {
 		v.vertex.xyz = mul(RotateAroundYInDegrees(-transform.w ), v.vertex.xyz);
 	}
-	if (data.x < 0) {
-		data.x = data.x - 500;
-	}
-	if (data.y < 0) {
-		data.y = data.y - 500;
-	}
+	
 
 	float3 localPosition = v.vertex.xyz * data.w;
-	float3 worldPosition = data.xyz + localPosition ;
+	float3 worldPosition = data.xyz + localPosition;	
 
 	float x = worldPosition.x / _PlanetInfo.x;;
 	float y = worldPosition.y / _PlanetInfo.x;;
@@ -140,9 +135,7 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 
 	o.normal = float3(dx, dy, dz);
 
-	//worldPosition.xyz = float3(dx, dy, dz) * _PlanetInfo.x;
-
-
+	worldPosition.xyz = float3(dx, dy, dz) * _PlanetInfo.x;
 
 	//calcule UV of heightMap
 	float3 n = normalize(float3(worldPosition.x, worldPosition.y, worldPosition.z));
@@ -156,8 +149,8 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 
 	//o.normal2 = normalize(o.normal * 2 - tex2Dlod(_PlanetNormalMap, float4(float2(uCoor, vCoor), 0.0, 0)));
 
-	//float height = tex2Dlod(_PlanetHeightMap, float4(float2(uCoor, vCoor), 0.0, 0));
-	//worldPosition.xyz = (worldPosition + n * (height * _PlanetInfo.y));
+	float height = tex2Dlod(_PlanetHeightMap, float4(float2(uCoor, vCoor), 0.0, 0));
+	worldPosition.xyz = (worldPosition + n * (height * _PlanetInfo.y));
 	
 	o.wordPosition = float4(worldPosition, 1.0f);
 	o.vertex = float4(worldPosition, 1.0f);

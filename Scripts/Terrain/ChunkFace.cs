@@ -119,7 +119,7 @@ public class ChunkFace
 
             positionToDraw = new Vector4((position.x), (position.y), (position.z), scale);
         }
-
+  
 
         if (isStillVisible)
         {

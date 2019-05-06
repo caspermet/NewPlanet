@@ -27,13 +27,13 @@ public class PauseMenu : MonoBehaviour {
     public void ActiveMenu()
     {
         MenuData.IsPause = true;
-        pauseMenuUI.SetActive(true);
+       // pauseMenuUI.SetActive(true);
     }
 
     public void DeactivateMenu()
     {
         MenuData.IsPause = false;
-        pauseMenuUI.SetActive(false);
+       // pauseMenuUI.SetActive(false);
     }
 
     public void Resume()

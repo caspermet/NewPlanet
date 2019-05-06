@@ -28,11 +28,11 @@
 			uniform float4 _LightColor0;
 
 			/*****************************************************************
-				Planet Info
+			Planet Info
 				x -> planet Radius ->  MaxScale / 2
 				y -> Max terrain height
 			********************************************************************/
-		//	float3 _PlanetInfo;
+			float3 _PlanetInfo;
 
 
 			float3 RotateAroundYInDegrees(float3 vertex, float degrees)
@@ -90,7 +90,7 @@
 
 			half4 skybox_frag(v2f i, sampler2D smp, half4 smpDecode)
 			{
-				float dist = (distance(float3(0, 0, 0), _WorldSpaceCameraPos)) - 63710;
+				float dist = (distance(float3(0, 0, 0), _WorldSpaceCameraPos)) - _PlanetInfo.x ;
 				float blenderIndex = 1;
 
 				if ((63710 * 0.2f) > dist) {

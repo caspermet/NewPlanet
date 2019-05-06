@@ -36,10 +36,10 @@ public class PlanetController : MonoBehaviour
     void Start()
     {
         planetInfo.x = PlanetData.PlanetRadius;
-        planetInfo.y = maxTerrainHeight;
+        planetInfo.y = PlanetData.MaxPlanetHeight;
         // PlanetData.PlanetRadius = planetInfo.x;
         //PlanetData.MaxPlanetHeight = planetInfo.y;
-       // normalMaps = CreateNormalMap.NormalMap(planetHeightMap, 1);
+        // normalMaps = CreateNormalMap.NormalMap(planetHeightMap, 1);
 
         cameraController = new CameraController(camera, PlanetData.PlanetRadius);
 
@@ -76,6 +76,7 @@ public class PlanetController : MonoBehaviour
     void Update()
     {
         planetInfo.x = PlanetData.PlanetRadius;
+        planetInfo.y = PlanetData.MaxPlanetHeight;
         cameraController.setDistance(PlanetData.PlanetRadius);
         materialBlock.SetVector("_CameraPosition", camera.transform.position);
         materialBlock.SetInt("_IsLODActive", (PlanetData.IsLODActive == false ? 0 : 1));
