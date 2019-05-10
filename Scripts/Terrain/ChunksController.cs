@@ -88,7 +88,7 @@ public class ChunksController
         drawMesh[1] = new DrawMeshInstanced(mesh);
         drawMesh[2] = new DrawMeshInstanced(mesh);
         drawMesh[3] = new DrawMeshInstanced(mesh);
-        Debug.Log(scale);
+       
         UpdateChunkMesh();
     }
 

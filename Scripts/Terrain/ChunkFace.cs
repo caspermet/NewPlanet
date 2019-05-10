@@ -10,7 +10,7 @@ public class ChunkFace
 
     private int chunkSize;
     private float scale;
-    private int level;
+    public int level;
 
     private Vector3 position;
     private Vector3 oldPosition;
@@ -49,13 +49,17 @@ public class ChunkFace
     int bottomNeighbor;
     int leftNeighbor;
 
+    private ChunkFace topNeighborr;
+    private ChunkFace rightNeighborr;
+    private ChunkFace bottomNeighborr;
+    private ChunkFace leftNeighborr;
 
-    public ChunkFace(ChunkFace parent, Vector3 position, float scale, Camera viewer, Vector4 directionX, Vector3 directionY,  bool isVisible, int level, int[] myDirection)
+    public ChunkFace(ChunkFace parent, Vector3 position, float scale, Camera viewer, Vector4 directionX, Vector3 directionY, bool isVisible, int level, int[] myDirection)
     {
         initialization(parent, position, scale, viewer, directionX, directionY, isVisible, level, myDirection);
     }
 
-    private void initialization(ChunkFace parent, Vector3 position, float scale, Camera viewer, Vector4 directionX, Vector3 directionY,  bool isVisible, int level, int[] myDirection)
+    private void initialization(ChunkFace parent, Vector3 position, float scale, Camera viewer, Vector4 directionX, Vector3 directionY, bool isVisible, int level, int[] myDirection)
     {
 
         this.parentChunk = parent;
@@ -94,9 +98,9 @@ public class ChunkFace
 
     private Vector3 CalculePositionOfSphere(Vector3 position)
     {
-        float x = position.x / PlanetData.PlanetRadius ;
-        float y = position.y / PlanetData.PlanetRadius ;
-        float z = position.z / PlanetData.PlanetRadius ;
+        float x = position.x / PlanetData.PlanetRadius;
+        float y = position.y / PlanetData.PlanetRadius;
+        float z = position.z / PlanetData.PlanetRadius;
 
         float dx = x * Mathf.Sqrt(1.0f - (y * y * 0.5f) - (z * z * 0.5f) + (y * y * z * z / 3.0f));
         float dy = y * Mathf.Sqrt(1.0f - (z * z * 0.5f) - (x * x * 0.5f) + (z * z * x * x / 3.0f));
@@ -119,7 +123,7 @@ public class ChunkFace
 
             positionToDraw = new Vector4((position.x), (position.y), (position.z), scale);
         }
-  
+
 
         if (isStillVisible)
         {
@@ -130,7 +134,7 @@ public class ChunkFace
         {
             return;
         }
- 
+
         var dist = Vector3.Distance(viewerPositon, bounds.ClosestPoint(viewerPositon));
         this.viewerPositon = viewerPositon;
         SetNeighborToNull();
@@ -154,9 +158,9 @@ public class ChunkFace
             int i = 0;
             foreach (var item in chunkTree)
             {
-                item.Update(viewerPositon, isVisible, steps[i], scale * 0.5f);      
+                item.Update(viewerPositon, isVisible, steps[i], scale * 0.5f);
                 i++;
-               
+
             }
 
         }
@@ -197,18 +201,18 @@ public class ChunkFace
         Vector4 edge;
 
         int rotate;
-        if (parentChunk == null)
-        {
-            edge.x = topLevelneighbor[0].IsHasChild();
-            edge.y = topLevelneighbor[1].IsHasChild();
-            edge.z = topLevelneighbor[2].IsHasChild();
-            edge.w = topLevelneighbor[3].IsHasChild();
-        }
-        else
-        {
-            int[] pomDirection = new int[2] { myDirection[0], myDirection[1] };
-            edge = FindEnge(pomDirection);
-        }
+        /* if (parentChunk == null)
+         {
+             edge.x = topLevelneighbor[0].IsHasChild();
+             edge.y = topLevelneighbor[1].IsHasChild();
+             edge.z = topLevelneighbor[2].IsHasChild();
+             edge.w = topLevelneighbor[3].IsHasChild();
+         }
+         else
+         {*/
+        // int[] pomDirection = new int[2] { myDirection[0], myDirection[1] };
+        edge = FindEnge2();
+        // }
 
 
 
@@ -243,6 +247,23 @@ public class ChunkFace
             positionsListArray[i].Clear();
             directionListArray[i].Clear();
         }
+    }
+
+    public Vector4 FindEnge2()
+    {
+        float right = 0;
+        float left = 0;
+        float bottom = 0;
+        float top = 0;
+
+
+        top = topNeighborr == null ? 0 : topNeighborr.IsHasChild();
+        right = rightNeighborr == null ? 0 : rightNeighborr.IsHasChild();
+        bottom = bottomNeighborr == null ? 0 : bottomNeighborr.IsHasChild();
+        left = leftNeighborr == null ? 0 : leftNeighborr.IsHasChild();
+
+
+        return new Vector4(right, bottom, left, top);
     }
 
     public Vector4 FindEnge(int[] direction)
@@ -510,7 +531,6 @@ public class ChunkFace
             return null;
         }
 
-
         if (chunkTree == null)
         {
             ClearPositionAndDirection();
@@ -520,6 +540,11 @@ public class ChunkFace
         }
         else
         {
+            chunkTree[0].UpdateNeighbor(topNeighborr, chunkTree[1], chunkTree[2], leftNeighborr);
+            chunkTree[1].UpdateNeighbor(topNeighborr, rightNeighborr, chunkTree[3], chunkTree[0]);
+            chunkTree[2].UpdateNeighbor(chunkTree[0], chunkTree[3], bottomNeighborr, leftNeighborr);
+            chunkTree[3].UpdateNeighbor(chunkTree[1], rightNeighborr, bottomNeighborr, chunkTree[2]);
+
             ClearPositionAndDirection();
 
             foreach (var chunk in chunkTree)
@@ -570,6 +595,87 @@ public class ChunkFace
     public void UpdateTopNeighbor(ChunkFace[] topLevelneighbor)
     {
         this.topLevelneighbor = topLevelneighbor;
+        topNeighborr = topLevelneighbor[0];
+        rightNeighborr = topLevelneighbor[1];
+        bottomNeighborr = topLevelneighbor[2];
+        leftNeighborr = topLevelneighbor[3];
+
+    }
+
+    public void UpdateNeighbor(ChunkFace top, ChunkFace right, ChunkFace bottom, ChunkFace left)
+    {
+        /*   if (level == 0)
+           {
+               return;
+           }*/
+        if (top == null)
+        {
+            topNeighborr = null;
+        }
+        else if (top.level == level)
+        {
+            topNeighborr = top;
+        }
+        else if (top.chunkTree != null)
+        {
+            topNeighborr = top.chunkTree[2 + myDirection[1]];
+        }
+        else
+        {
+            topNeighborr = null;
+        }
+
+        if (right == null)
+        {
+            rightNeighborr = null;
+        }
+        else if (right.level == level)
+        {
+            rightNeighborr = right;
+        }
+        else if (right.chunkTree != null)
+        {
+            rightNeighborr = right.chunkTree[myDirection[0] * 2];
+        }
+        else
+        {
+            rightNeighborr = null;
+        }
+
+        if (bottom == null)
+        {
+            bottomNeighborr = null;
+        }
+        else if (bottom.level == level)
+        {
+            bottomNeighborr = bottom;
+        }
+        else if (bottom.chunkTree != null)
+        {
+            bottomNeighborr = bottom.chunkTree[myDirection[1]];
+        }
+        else
+        {
+            bottomNeighborr = null;
+        }
+
+        if (left == null)
+        {
+            leftNeighborr = null;
+        }
+ 
+        else if (left.level == level)
+        {
+            leftNeighborr = left;
+        }
+        else if (left.chunkTree != null)
+        {
+            leftNeighborr = left.chunkTree[1 + myDirection[0] * 2];   
+        }
+        else
+        {
+            leftNeighborr = null;
+        }
     }
 
     public void SubDivide(Vector3 viewerPosition)

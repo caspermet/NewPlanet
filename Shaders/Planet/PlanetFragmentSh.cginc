@@ -18,11 +18,10 @@ void geom(triangle DS_OUTPUT IN[3], inout TriangleStream<GM_OUTPUT> tristream)
 	}
 }
 
-
 float3 calcColor2(GM_OUTPUT input, float3 textureColor) {
 
 	float3 normalDirection = input.normal;
-	float3 normalDirection2 = input.normal;
+	float3 normalDirection2 = input.normal2;
 
 	float3 viewDirection = normalize(_WorldSpaceCameraPos - input.wordPosition.xyz);
 	float3 lightDirection = normalize(_WorldSpaceLightPos0.xyz);
@@ -81,7 +80,7 @@ fixed4 FS(GM_OUTPUT i, uint instanceID : SV_InstanceID) : SV_Target
 	float dist = distance(_CameraPosition, float3(0, 0, 0)) - _PlanetInfo.x;
 	fixed4 c;
 	float uCoor2;
-	float spectrum = tex2D(_SpecularMap,float2(uCoor, vCoor)).r;
+	//float spectrum = tex2D(_SpecularMap,float2(uCoor, vCoor)).r;
 	c = tex2Dlod(_PlanetTextures, float4(uCoor, vCoor, 0.0, 0));
 
 	float3 calc;

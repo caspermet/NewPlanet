@@ -387,19 +387,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d40039d8c068eb043b8901228b83206c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  planetRotSpeed: 1
-  sunRotSpeed: 1
-  sun: {fileID: 0}
-  planets:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  SkyBox: {fileID: 2100000, guid: 04ace7276bb5319438eb4712431bb7c3, type: 2}
   Height: 5
   maxHeight: 5
   style:
@@ -536,7 +524,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 7b46152e0f6fc3045b645b969c9dad3a, type: 2}
   - {fileID: 2100000, guid: 495c30b4c3a649d4a9f481f1c9d15516, type: 2}
   - {fileID: 2100000, guid: 495c30b4c3a649d4a9f481f1c9d15516, type: 2}
-  normalMaps: {fileID: 0}
+  normalMapss: {fileID: 0}
 --- !u!1 &1937354030
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class PlanetData {
+public static class PlanetData
+{
 
-    private static float planetRadius = 63710;
-    private static float planetDiameter = 127420;
+    private static float planetRadius = 50 / 2;
+    private static float planetDiameter = 50;
     private static float maxPlanetHeight = 1000;
 
     private static float minPlanetRadius = 1;
     private static float maxPlanetRadius = 127420;
     private static bool isLODActive = false;
+    private static Vector3 spaceMove = new Vector3(0, 0, 0);
 
     public static float PlanetRadius
     {
@@ -23,7 +25,20 @@ public static class PlanetData {
             planetRadius = value;
         }
     }
-     public static float PlanetDiameter
+
+    public static Vector3 SpaceMove
+    {
+        get
+        {
+            return spaceMove;
+        }
+        set
+        {
+            spaceMove = value;
+        }
+    }
+
+    public static float PlanetDiameter
     {
         get
         {

@@ -4,10 +4,6 @@ using System.Collections;
 public class SceneManager : MonoBehaviour
 {
     public Material SkyBox;
-    public float planetRotSpeed = 1.0f;
-    public float sunRotSpeed = 1.0f;
-    public Transform sun;
-    public Transform[] planets = new Transform[9];
     public float Height = 5;
     public float maxHeight = 5;
     public GUIStyle style;

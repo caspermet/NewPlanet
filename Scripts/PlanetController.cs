@@ -1,13 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class PlanetController : MonoBehaviour
-{ 
+{
     public float noise = 20;
-    public float width = 20;  
+    public float width = 20;
 
-    public Material instanceMaterial;
+    public Material clouds;
     public Camera camera;
 
     public float maxScale;
@@ -31,7 +32,7 @@ public class PlanetController : MonoBehaviour
     private CameraController cameraController;
     private MaterialPropertyBlock materialBlock;
 
-    public Texture2D normalMaps;
+    public Texture2D normalMapss;
 
     void Start()
     {
@@ -39,8 +40,10 @@ public class PlanetController : MonoBehaviour
         planetInfo.y = PlanetData.MaxPlanetHeight;
         // PlanetData.PlanetRadius = planetInfo.x;
         //PlanetData.MaxPlanetHeight = planetInfo.y;
-        // normalMaps = CreateNormalMap.NormalMap(planetHeightMap, 1);
+        // normalMapss = CreateNormalMap.NormalMap(planetHeightMap, 1);
+        // normalMapss = LoadPNG("Assets/Map/gebco_08_rev_elev_21600x10800.png");
 
+  
         cameraController = new CameraController(camera, PlanetData.PlanetRadius);
 
         SetMaterialProperties();
@@ -55,7 +58,7 @@ public class PlanetController : MonoBehaviour
         materialBlock.SetTexture("_PlanetTextures", planetTexture);
         materialBlock.SetTexture("_PlanetHeightMap", planetHeightMap);
         materialBlock.SetTexture("_PlanetSpecular", planetSpecular);
-       // materialBlock.SetTexture("_PlanetNormalMap", normalMaps);
+        // materialBlock.SetTexture("_PlanetNormalMap", normalMapss);
 
         materialBlock.SetTexture("_noiseTexture", PerlingNoise.CreateNoise((int)width, noise));
 
@@ -69,7 +72,8 @@ public class PlanetController : MonoBehaviour
     void CreateSpehere()
     {
         sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        sphere.transform.localScale += new Vector3(planetInfo.x * 2 - 5, planetInfo.x * 2 - 5, planetInfo.x * 2 - 5);
+        sphere.GetComponent<MeshRenderer>().material = clouds;
+        sphere.transform.localScale += new Vector3(planetInfo.x * 2.1f, planetInfo.x * 2.1f, planetInfo.x * 2.1f);
     }
 
 
@@ -81,7 +85,7 @@ public class PlanetController : MonoBehaviour
         materialBlock.SetVector("_CameraPosition", camera.transform.position);
         materialBlock.SetInt("_IsLODActive", (PlanetData.IsLODActive == false ? 0 : 1));
         materialBlock.SetVector("_PlanetInfo", planetInfo);
-
+      
         cameraController.cameraUpdate();
         chunk.Update(instanceMaterials, materialBlock, PlanetData.PlanetDiameter); 
     }
@@ -90,6 +94,4 @@ public class PlanetController : MonoBehaviour
     {
         chunk.Disable();
     }
-
-
 }

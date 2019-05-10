@@ -65,7 +65,27 @@ float3 filterNormalLod(float4 uv, float scale, float3 normal)
 	n.x = h[1] - h[2];
 	n.y = 2; 
 
-	return   normalize(float3(0, 1, 0) - normalize(n) + normal);
+	return   normalize(normalize(n));
+}
+
+float3 CalculeNormal(float3 vector1, float3 vector2, float3 vector3) {
+	float3 n = cross(vector1, vector2);
+	float3 asd = cross(vector1, vector2);
+	float vm1 = sqrt(asd.x*asd.x + asd.y*asd.y + asd.z*asd.z);
+	float vm2 = sqrt(vector2.x * vector2.x + vector2.y * vector2.y + vector2.z * vector2.z);
+	n = normalize(n / (vm1));
+
+	float angle = acos(dot(vector1, vector1)/(vm2 * vm2));
+
+	float s = sin(angle);
+	float c = cos(angle);
+
+	float3x3 matrixx = (
+		n.x * n.x * (1 - c) + c       , n.y * n.x * (1 - c) - s * n.z, n.x * n.z * (1 - c) + s * n.y,
+		n.x * n.y * (1 - c) + s * n.z , n.y * n.y * (1 - c) + c      , n.y * n.z * (1 - c) - s * n.x,
+		n.x * n.z * (1 - c) - s * n.y , n.y * n.z * (1 - c) + s * n.x, n.z * n.z * (1 - c) + c);
+
+	return mul(matrixx, normalize(vector2));
 }
 
 
@@ -134,8 +154,9 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	float dz = z * sqrt(1.0f - (x*x * 0.5f) - (y * y * 0.5f) + (x*x*y*y / 3.0f));
 
 	o.normal = float3(dx, dy, dz);
+	o.normal2 = float3(dx, dy, dz);
 
-	worldPosition.xyz = float3(dx, dy, dz) * _PlanetInfo.x;
+	//worldPosition.xyz = float3(dx, dy, dz) * _PlanetInfo.x;
 
 	//calcule UV of heightMap
 	float3 n = normalize(float3(worldPosition.x, worldPosition.y, worldPosition.z));
@@ -145,9 +166,10 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 	float tessellation = data.w;
 
 //	o.normal2 = filterNormalLod(uvlod, data.w, o.normal, worldPosition);
-	o.normal2 = filterNormalLod(float4(uCoor, vCoor,0, 1.0), data.w, n);
-
-	//o.normal2 = normalize(o.normal * 2 - tex2Dlod(_PlanetNormalMap, float4(float2(uCoor, vCoor), 0.0, 0)));
+	//o.normal2 = filterNormalLod(float4(uCoor, vCoor,0, 1.0), data.w, n);
+	//CalculeNormal(float3(0,1,0), o.normal, o.normal2);
+	//o.normal2 = tex2Dlod(_PlanetNormalMap, float4(float2(uCoor, vCoor), 0.0, 0));
+	//o.normal2 = CalculeNormal(o.normal, o.normal, o.normal);
 
 	float height = tex2Dlod(_PlanetHeightMap, float4(float2(uCoor, vCoor), 0.0, 0));
 	worldPosition.xyz = (worldPosition + n * (height * _PlanetInfo.y));
