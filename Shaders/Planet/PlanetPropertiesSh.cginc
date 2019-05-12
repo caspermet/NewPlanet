@@ -61,8 +61,8 @@ sampler2D _PlanetNormalMap;
 
 /*
 UNITY_DECLARE_TEX2DARRAY(_PlanetTexturesTop);
-UNITY_DECLARE_TEX2DARRAY(_PlanetTexturesBottom);
-UNITY_DECLARE_TEX2DARRAY(_SurfaceTexture);*/
+UNITY_DECLARE_TEX2DARRAY(_PlanetTexturesBottom);*/
+UNITY_DECLARE_TEX2DARRAY(_SurfaceTexture);
 
 /*****************************************************************
 Planet Info
@@ -94,6 +94,7 @@ struct VS_OUTPUT
 	float4 wordPosition : TEXCOORD1;
 	float tess : TEXCOORD2;
 	float height : TEXCOORD3;
+	float angle : TEXCOORD4;
 };
 
 struct HS_OUTPUT
@@ -105,6 +106,7 @@ struct HS_OUTPUT
 	float4 wordPosition : TEXCOORD1;
 	float tess : TEXCOORD2;
 	float height : TEXCOORD3;
+	float angle : TEXCOORD4;
 };
 
 struct DS_OUTPUT
@@ -115,6 +117,7 @@ struct DS_OUTPUT
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
 	float height : TEXCOORD2;
+	float angle : TEXCOORD4;
 };
 struct GM_OUTPUT
 {
@@ -124,4 +127,15 @@ struct GM_OUTPUT
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
 	float height : TEXCOORD2;
+	float angle : TEXCOORD4;
 };
+
+
+const static int maxLayerCount = 8;
+
+int layerCount;
+float3 baseColours[maxLayerCount];
+float baseStartHeights[maxLayerCount];
+float baseBlends[maxLayerCount];
+float baseColourStrength[maxLayerCount];
+float baseTextureScales[maxLayerCount];

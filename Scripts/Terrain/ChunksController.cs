@@ -202,8 +202,8 @@ public class ChunksController
     }
 
     private void UpdateAllMesh()
-    {     
-
+    {
+        int lenght = 0;
         for (int i = 0; i < 4; i++)
         {
             Vector4[] viewedChunkCoordd;
@@ -216,8 +216,10 @@ public class ChunksController
             {       
                 drawMesh[i].UpdateData(viewedChunkCoordd.Length, viewedChunkCoordd, directionArray, i, instanceMaterials[i], materialBlock);
                 drawMesh[i].Draw();
+                lenght += viewedChunkCoordd.Length;
             }
         }
+       // Debug.Log(15 * 15 * 2 * lenght);
     }
 
     private void GetActiveChunksFromChunkTree(ref List<ChunkFace> chunkFaceList, ChunkFace chunkTree)

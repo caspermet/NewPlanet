@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Linq;
 
 public class PlanetController : MonoBehaviour
 {
@@ -22,6 +23,9 @@ public class PlanetController : MonoBehaviour
     public Texture2D planetHeightMap;
     public Texture2D planetSpecular;
 
+
+    public Texture2D[]texture;
+
     public Material[] instanceMaterials;
 
     private float gamma = 1.0f;
@@ -33,16 +37,20 @@ public class PlanetController : MonoBehaviour
     private MaterialPropertyBlock materialBlock;
 
     public Texture2D normalMapss;
+    public int angle;
+
+    public Layer[] layers;
 
     void Start()
     {
         planetInfo.x = PlanetData.PlanetRadius;
         planetInfo.y = PlanetData.MaxPlanetHeight;
+        PlanetData.CameraPosition = camera.transform.position;
         // PlanetData.PlanetRadius = planetInfo.x;
         //PlanetData.MaxPlanetHeight = planetInfo.y;
         // normalMapss = CreateNormalMap.NormalMap(planetHeightMap, 1);
         // normalMapss = LoadPNG("Assets/Map/gebco_08_rev_elev_21600x10800.png");
-
+       // CreateSpehere();
   
         cameraController = new CameraController(camera, PlanetData.PlanetRadius);
 
@@ -54,7 +62,7 @@ public class PlanetController : MonoBehaviour
     {
         materialBlock = new MaterialPropertyBlock();
 
-
+        materialBlock.SetTexture("_SurfaceTexture", LoadArrayTexture.DoTexture(texture));
         materialBlock.SetTexture("_PlanetTextures", planetTexture);
         materialBlock.SetTexture("_PlanetHeightMap", planetHeightMap);
         materialBlock.SetTexture("_PlanetSpecular", planetSpecular);
@@ -67,25 +75,48 @@ public class PlanetController : MonoBehaviour
         materialBlock.SetFloat("_Gamma", gamma);
         materialBlock.SetFloat("fHdrExposure", hdrExposure);
         materialBlock.SetInt("_IsLODActive", 0);
+
+        materialBlock.SetInt("layerCount", layers.Length);
+        materialBlock.SetFloatArray("baseStartHeights", layers.Select(x => x.startAngle).ToArray());
+        materialBlock.SetFloatArray("baseBlends", layers.Select(x => x.blendStrength).ToArray());
+        materialBlock.SetFloatArray("baseColourStrength", layers.Select(x => x.tintStrength).ToArray());
+
+        Texture2DArray texturesArray = LoadArrayTexture.DoTexture(layers.Select(x => x.texture).ToArray());
+        materialBlock.SetTexture("baseTextures", texturesArray);
     }
 
     void CreateSpehere()
     {
         sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        sphere.GetComponent<MeshRenderer>().material = clouds;
-        sphere.transform.localScale += new Vector3(planetInfo.x * 2.1f, planetInfo.x * 2.1f, planetInfo.x * 2.1f);
+        //   sphere.GetComponent<MeshRenderer>().material = clouds;
+        sphere.transform.localScale = new Vector3(planetInfo.x * 2.3f, planetInfo.x * 2.3f, planetInfo.x * 2.3f);
     }
+
+
 
 
     void Update()
     {
         planetInfo.x = PlanetData.PlanetRadius;
         planetInfo.y = PlanetData.MaxPlanetHeight;
+        PlanetData.CameraPosition = camera.transform.position;
+        PlanetData.Angle = angle;
+      
         cameraController.setDistance(PlanetData.PlanetRadius);
         materialBlock.SetVector("_CameraPosition", camera.transform.position);
         materialBlock.SetInt("_IsLODActive", (PlanetData.IsLODActive == false ? 0 : 1));
         materialBlock.SetVector("_PlanetInfo", planetInfo);
-      
+
+        materialBlock.SetInt("layerCount", layers.Length);
+        materialBlock.SetFloatArray("baseStartHeights", layers.Select(x => x.startAngle).ToArray());
+        materialBlock.SetFloatArray("baseBlends", layers.Select(x => x.blendStrength).ToArray());
+        materialBlock.SetFloatArray("baseColourStrength", layers.Select(x => x.tintStrength).ToArray());
+
+      /*  Texture2DArray texturesArray = LoadArrayTexture.DoTexture(layers.Select(x => x.texture).ToArray());
+        materialBlock.SetTexture("baseTextures", texturesArray);*/
+
+
+
         cameraController.cameraUpdate();
         chunk.Update(instanceMaterials, materialBlock, PlanetData.PlanetDiameter); 
     }
@@ -93,5 +124,17 @@ public class PlanetController : MonoBehaviour
     void OnDisable()
     {
         chunk.Disable();
+    }
+
+    [System.Serializable]
+    public class Layer
+    {
+        public Texture2D texture;
+        [Range(0, 1)]
+        public float tintStrength;
+        [Range(0, 1)]
+        public float startAngle;
+        [Range(0, 1)]
+        public float blendStrength;
     }
 }

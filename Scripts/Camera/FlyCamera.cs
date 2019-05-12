@@ -42,13 +42,15 @@ public class FlyCamera
     {
         float cameraDistanc = Vector3.Distance(camera.transform.position, new Vector3(0, 0, 0));
        
-        cameraDistanc = cameraDistanc - planerRadius;
-        if (cameraDistanc > planerRadius)
+        cameraDistanc = cameraDistanc - PlanetData.PlanetRadius;
+        maxSpeed = PlanetData.PlanetRadius * 0.5f;
+
+        if (cameraDistanc > PlanetData.PlanetRadius)
         {
             normalMoveSpeed = maxSpeed;
         }
         else {
-            normalMoveSpeed = (cameraDistanc / planerRadius) * maxSpeed;
+            normalMoveSpeed = (cameraDistanc / PlanetData.PlanetRadius) * maxSpeed;
             if (normalMoveSpeed < minSpeed)
             {
                 normalMoveSpeed = minSpeed;

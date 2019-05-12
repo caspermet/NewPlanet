@@ -5,14 +5,15 @@ using UnityEngine;
 public static class PlanetData
 {
 
-    private static float planetRadius = 50 / 2;
-    private static float planetDiameter = 50;
-    private static float maxPlanetHeight = 1000;
+    private static float planetRadius = 7463 / 2;
+    private static float planetDiameter = 7463 ;
+    private static float maxPlanetHeight = 1;
 
-    private static float minPlanetRadius = 1;
-    private static float maxPlanetRadius = 127420;
+    private static float minPlanetRadius = 100;
+    private static float maxPlanetRadius = 65536*4;
     private static bool isLODActive = false;
-    private static Vector3 spaceMove = new Vector3(0, 0, 0);
+    private static Vector3 cameraPosition;
+    private static int angle;
 
     public static float PlanetRadius
     {
@@ -26,15 +27,27 @@ public static class PlanetData
         }
     }
 
-    public static Vector3 SpaceMove
+    public static Vector3 CameraPosition
     {
         get
         {
-            return spaceMove;
+            return cameraPosition;
         }
         set
         {
-            spaceMove = value;
+            cameraPosition = value;
+        }
+    }
+
+    public static int Angle
+    {
+        get
+        {
+            return angle;
+        }
+        set
+        {
+            angle = value;
         }
     }
 

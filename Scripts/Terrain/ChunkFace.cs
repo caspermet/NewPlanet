@@ -44,15 +44,10 @@ public class ChunkFace
     private Vector3[] steps;
     bool isMerge;
 
-    int topNeighbor;
-    int rightNeighbor;
-    int bottomNeighbor;
-    int leftNeighbor;
-
-    private ChunkFace topNeighborr;
-    private ChunkFace rightNeighborr;
-    private ChunkFace bottomNeighborr;
-    private ChunkFace leftNeighborr;
+    private ChunkFace topNeighbor;
+    private ChunkFace rightNeighbor;
+    private ChunkFace bottomNeighbor;
+    private ChunkFace leftNeighbor;
 
     public ChunkFace(ChunkFace parent, Vector3 position, float scale, Camera viewer, Vector4 directionX, Vector3 directionY, bool isVisible, int level, int[] myDirection)
     {
@@ -118,7 +113,7 @@ public class ChunkFace
             position = positionA;
             Vector3 newPosition = CalculePositionOfSphere(positionA);
             bounds.center = newPosition;
-            bounds.size = newPosition.normalized * scale;
+            bounds.size = (new Vector3(1, 1, 1) - newPosition.normalized) * scale;
             RecalculSteps();
 
             positionToDraw = new Vector4((position.x), (position.y), (position.z), scale);
@@ -127,7 +122,7 @@ public class ChunkFace
 
         if (isStillVisible)
         {
-            isVisible = FrustumCulling.Frustum(camera, bounds.center, scale * 0.5f);
+            isVisible = FrustumCulling.Frustum(camera, bounds.center, scale * 0.5f, bounds);
         }
 
         if (!isVisible)
@@ -137,7 +132,6 @@ public class ChunkFace
 
         var dist = Vector3.Distance(viewerPositon, bounds.ClosestPoint(viewerPositon));
         this.viewerPositon = viewerPositon;
-        SetNeighborToNull();
 
         if (parentChunk != null)
         {
@@ -168,16 +162,12 @@ public class ChunkFace
         {
             SubDivide(viewerPositon);
         }
+        else
+        {
+            isVisible = FrustumCulling.horizont(camera, bounds.center);
+        }
 
         return;
-    }
-
-    private void SetNeighborToNull()
-    {
-        topNeighbor = 2;
-        rightNeighbor = 2;
-        bottomNeighbor = 2;
-        leftNeighbor = 2;
     }
 
     private void RecalculSteps()
@@ -201,18 +191,7 @@ public class ChunkFace
         Vector4 edge;
 
         int rotate;
-        /* if (parentChunk == null)
-         {
-             edge.x = topLevelneighbor[0].IsHasChild();
-             edge.y = topLevelneighbor[1].IsHasChild();
-             edge.z = topLevelneighbor[2].IsHasChild();
-             edge.w = topLevelneighbor[3].IsHasChild();
-         }
-         else
-         {*/
-        // int[] pomDirection = new int[2] { myDirection[0], myDirection[1] };
         edge = FindEnge2();
-        // }
 
 
 
@@ -257,225 +236,12 @@ public class ChunkFace
         float top = 0;
 
 
-        top = topNeighborr == null ? 0 : topNeighborr.IsHasChild();
-        right = rightNeighborr == null ? 0 : rightNeighborr.IsHasChild();
-        bottom = bottomNeighborr == null ? 0 : bottomNeighborr.IsHasChild();
-        left = leftNeighborr == null ? 0 : leftNeighborr.IsHasChild();
-
-
-        return new Vector4(right, bottom, left, top);
-    }
-
-    public Vector4 FindEnge(int[] direction)
-    {
-        Vector4 activeEdge;
-        float right = 0;
-        float left = 0;
-        float bottom = 0;
-        float top = 0;
-        Stack<int[]> myStack = new Stack<int[]>();
-
-        if (direction[0] == 0)
-        {
-            if (direction[1] == 0)
-            {
-                ///// left-top
-                right = parentChunk.chunkTree[1].IsHasChild();
-                bottom = parentChunk.chunkTree[2].IsHasChild();
-
-                left = leftNeighbor != 2 ? leftNeighbor : parentChunk.FindEdge(myDirection, myStack, "left") ? 1 : 0;
-                myStack.Clear();
-                top = topNeighbor != 2 ? topNeighbor : parentChunk.FindEdge(myDirection, myStack, "top") ? 1 : 0;
-            }
-            else
-            {
-                ///// right-top
-                left = parentChunk.chunkTree[0].IsHasChild();
-                bottom = parentChunk.chunkTree[3].IsHasChild();
-
-                right = rightNeighbor != 2 ? rightNeighbor : parentChunk.FindEdge(myDirection, myStack, "right") ? 1 : 0;
-                myStack.Clear();
-                top = topNeighbor != 2 ? topNeighbor : parentChunk.FindEdge(myDirection, myStack, "top") ? 1 : 0;
-            }
-        }
-        else if (direction[0] == 1)
-        {
-            if (direction[1] == 0)
-            {
-                ///// left bottom
-                top = parentChunk.chunkTree[0].IsHasChild();
-                right = parentChunk.chunkTree[3].IsHasChild();
-
-                left = leftNeighbor != 2 ? leftNeighbor : parentChunk.FindEdge(myDirection, myStack, "left") ? 1 : 0;
-                myStack.Clear();
-                bottom = bottomNeighbor != 2 ? bottomNeighbor : parentChunk.FindEdge(myDirection, myStack, "bottom") ? 1 : 0;
-            }
-            else
-            {
-                ///// right-bottom
-                top = parentChunk.chunkTree[1].IsHasChild();
-                left = parentChunk.chunkTree[2].IsHasChild();
-
-                right = rightNeighbor != 2 ? rightNeighbor : parentChunk.FindEdge(myDirection, myStack, "right") ? 1 : 0;
-                myStack.Clear();
-                bottom = bottomNeighbor != 2 ? bottomNeighbor : parentChunk.FindEdge(myDirection, myStack, "bottom") ? 1 : 0;
-            }
-        }
+        top = topNeighbor == null ? 0 : topNeighbor.IsHasChild();
+        right = rightNeighbor == null ? 0 : rightNeighbor.IsHasChild();
+        bottom = bottomNeighbor == null ? 0 : bottomNeighbor.IsHasChild();
+        left = leftNeighbor == null ? 0 : leftNeighbor.IsHasChild();
 
         return new Vector4(right, bottom, left, top);
-    }
-
-    private bool isEdgeOnlowerLevel(Vector3 position)
-    {
-        Vector3 testPositon = CalculePositionOfSphere(position);
-        Bounds hypBouds = new Bounds(testPositon, testPositon.normalized * scale);
-
-
-        var dist = Vector3.Distance(viewerPositon, hypBouds.ClosestPoint(viewerPositon));
-
-
-        if (scale * 2 > dist)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    public bool FindEdge(int[] baseDirection, Stack<int[]> positionsList, string ask)
-    {
-
-
-        if ((string.Equals(ask, "left") && baseDirection[1] == 1) || (ask == "right" && baseDirection[1] == 0))
-        {
-            positionsList.Push(baseDirection);
-            return FindEdgeInsite(positionsList, new int[] { 0, 1 }, ask);
-        }
-        else if ((ask == "top" && baseDirection[0] == 1) || (ask == "bottom" && baseDirection[0] == 0))
-        {
-            positionsList.Push(baseDirection);
-            return FindEdgeInsite(positionsList, new int[] { 1, 0 }, ask);
-        }
-        else if (parentChunk != null)
-        {
-            positionsList.Push(baseDirection);
-            int[] pom = new int[] { myDirection[0], myDirection[1] };
-            return parentChunk.FindEdge(pom, positionsList, ask);
-        }
-        else
-        {
-            positionsList.Push(baseDirection);
-            return topLevelSearch(positionsList, ask);
-
-        }
-
-    }
-
-    public bool topLevelSearch(Stack<int[]> positionsList, string ask)
-    {
-        int index = 0;
-        int[] from = null;
-        switch (ask)
-        {
-            case "top":
-                index = 0;
-                from = new int[] { 1, 0 };
-                break;
-            case "right":
-                index = 1;
-                from = new int[] { 0, 1 };
-                break;
-            case "bottom":
-                index = 2;
-                from = new int[] { 1, 0 };
-                break;
-            case "left":
-                index = 3;
-                from = new int[] { 0, 1 };
-                break;
-            default:
-                return false;
-        }
-
-        return topLevelneighbor[index].FindEdgeInsite(positionsList, from, ask);
-    }
-
-    public bool FindEdgeInsite(Stack<int[]> positionStack, int[] direction, string ask)
-    {
-        if (!isVisible)
-        {
-            return false;
-        }
-
-        if (positionStack.Count == 0 && chunkTree != null)
-        {
-            SetNeighbor(ask, 0);
-            return true;
-        }
-        if (positionStack.Count == 1 && chunkTree == null)
-        {
-            SetNeighbor(ask, 1);
-            return false;
-        }
-        if (chunkTree == null || positionStack.Count == 0)
-        {
-            return false;
-        }
-
-        bool isEdge = false;
-
-        int[] backDirection = positionStack.Pop();
-        int A = backDirection[0];
-        int B = backDirection[1];
-
-        if (direction[0] == 1)
-        {
-            if (backDirection[0] == 1)
-            {
-                A = 0;
-            }
-            else
-            {
-                A = 1;
-            }
-        }
-        else
-        {
-            if (backDirection[1] == 1)
-            {
-                B = 0;
-            }
-            else
-            {
-                B = 1;
-            }
-
-        }
-
-        isEdge = chunkTree[A * 2 + B].FindEdgeInsite(positionStack, direction, ask);
-
-        return isEdge;
-
-
-    }
-
-    private void SetNeighbor(string ask, int value)
-    {
-        switch (ask)
-        {
-            case "top":
-                bottomNeighbor = value;
-                break;
-            case "right":
-                leftNeighbor = value;
-                break;
-            case "bottom":
-                topNeighbor = value;
-                break;
-            case "left":
-                rightNeighbor = value;
-                break;
-        }
     }
 
     public ChunkFace[] getChunkTree()
@@ -540,10 +306,10 @@ public class ChunkFace
         }
         else
         {
-            chunkTree[0].UpdateNeighbor(topNeighborr, chunkTree[1], chunkTree[2], leftNeighborr);
-            chunkTree[1].UpdateNeighbor(topNeighborr, rightNeighborr, chunkTree[3], chunkTree[0]);
-            chunkTree[2].UpdateNeighbor(chunkTree[0], chunkTree[3], bottomNeighborr, leftNeighborr);
-            chunkTree[3].UpdateNeighbor(chunkTree[1], rightNeighborr, bottomNeighborr, chunkTree[2]);
+            chunkTree[0].UpdateNeighbor(topNeighbor, chunkTree[1], chunkTree[2], leftNeighbor);
+            chunkTree[1].UpdateNeighbor(topNeighbor, rightNeighbor, chunkTree[3], chunkTree[0]);
+            chunkTree[2].UpdateNeighbor(chunkTree[0], chunkTree[3], bottomNeighbor, leftNeighbor);
+            chunkTree[3].UpdateNeighbor(chunkTree[1], rightNeighbor, bottomNeighbor, chunkTree[2]);
 
             ClearPositionAndDirection();
 
@@ -595,86 +361,134 @@ public class ChunkFace
     public void UpdateTopNeighbor(ChunkFace[] topLevelneighbor)
     {
         this.topLevelneighbor = topLevelneighbor;
-        topNeighborr = topLevelneighbor[0];
-        rightNeighborr = topLevelneighbor[1];
-        bottomNeighborr = topLevelneighbor[2];
-        leftNeighborr = topLevelneighbor[3];
+        topNeighbor = topLevelneighbor[0];
+        rightNeighbor = topLevelneighbor[1];
+        bottomNeighbor = topLevelneighbor[2];
+        leftNeighbor = topLevelneighbor[3];
 
     }
 
     public void UpdateNeighbor(ChunkFace top, ChunkFace right, ChunkFace bottom, ChunkFace left)
     {
-        /*   if (level == 0)
-           {
-               return;
-           }*/
         if (top == null)
         {
-            topNeighborr = null;
+            topNeighbor = null;
         }
         else if (top.level == level)
         {
-            topNeighborr = top;
+            topNeighbor = top;
         }
         else if (top.chunkTree != null)
         {
-            topNeighborr = top.chunkTree[2 + myDirection[1]];
+            float distance = 0;
+            float oldDistance = 0;
+            int index = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                oldDistance = Vector3.Distance(bounds.center, top.chunkTree[i].bounds.center);
+                if (i == 0 || oldDistance < distance)
+                {
+                    distance = oldDistance;
+                    index = i;
+                }
+            }
+
+            topNeighbor = top.chunkTree[index];
         }
         else
         {
-            topNeighborr = null;
+            topNeighbor = null;
         }
 
         if (right == null)
         {
-            rightNeighborr = null;
+            rightNeighbor = null;
         }
         else if (right.level == level)
         {
-            rightNeighborr = right;
+            rightNeighbor = right;
         }
         else if (right.chunkTree != null)
         {
-            rightNeighborr = right.chunkTree[myDirection[0] * 2];
+            float distance = 0;
+            float oldDistance = 0;
+            int index = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                oldDistance = Vector3.Distance(bounds.center, right.chunkTree[i].bounds.center);
+                if (i == 0 || oldDistance <= distance)
+                {
+                    distance = oldDistance;
+                    index = i;
+                }
+            }
+
+            rightNeighbor = right.chunkTree[index];
         }
         else
         {
-            rightNeighborr = null;
+            rightNeighbor = null;
         }
 
         if (bottom == null)
         {
-            bottomNeighborr = null;
+            bottomNeighbor = null;
         }
         else if (bottom.level == level)
         {
-            bottomNeighborr = bottom;
+            bottomNeighbor = bottom;
         }
         else if (bottom.chunkTree != null)
         {
-            bottomNeighborr = bottom.chunkTree[myDirection[1]];
+            float distance = 0;
+            float oldDistance = 0;
+            int index = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                oldDistance = Vector3.Distance(bounds.center, bottom.chunkTree[i].bounds.center);
+                if (i == 0 || oldDistance < distance)
+                {
+                    distance = oldDistance;
+                    index = i;
+                }
+            }
+
+            bottomNeighbor = bottom.chunkTree[index];
         }
         else
         {
-            bottomNeighborr = null;
+            bottomNeighbor = null;
         }
 
         if (left == null)
         {
-            leftNeighborr = null;
+            leftNeighbor = null;
         }
- 
+
         else if (left.level == level)
         {
-            leftNeighborr = left;
+            leftNeighbor = left;
         }
         else if (left.chunkTree != null)
         {
-            leftNeighborr = left.chunkTree[1 + myDirection[0] * 2];   
+            float distance = 0;
+            float oldDistance = 0;
+            int index = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                oldDistance = Vector3.Distance(bounds.center, left.chunkTree[i].bounds.center);
+                if (i == 0 || oldDistance < distance)
+                {
+                    distance = oldDistance;
+                    index = i;
+                }
+            }
+
+            leftNeighbor = left.chunkTree[index];
         }
         else
         {
-            leftNeighborr = null;
+            leftNeighbor = null;
         }
     }
 
