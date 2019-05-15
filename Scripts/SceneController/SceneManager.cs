@@ -15,6 +15,13 @@ public class SceneManager : MonoBehaviour
 
     void Start()
     {
+        Debug.Log(PlanetData.IsMenu);
+        if (PlanetData.IsMenu)
+        {
+            return;
+        }
+        
+       
 
         maxSlider = PlanetData.MaxPlanetRadius * 0.01f;
         Height = PlanetData.PlanetDiameter;
@@ -52,7 +59,7 @@ public class SceneManager : MonoBehaviour
 
     void OnGUI()
     {
-        
+/*
         GUILayout.BeginArea(new Rect(0, 0, 280, 180), style);
         maxSlider = Height * 0.01f;
         if(maxHeight > maxSlider)
@@ -64,15 +71,12 @@ public class SceneManager : MonoBehaviour
             Application.Quit();
         }
 
-        GUILayout.Label("Průměr planety = " + Height, GUILayout.ExpandWidth(false));
+        GUILayout.Label("Průměr planety = " + Height + " m", GUILayout.ExpandWidth(false));
         Height = GUILayout.HorizontalSlider(Height, PlanetData.MinPlanetRadius, PlanetData.MaxPlanetRadius, GUILayout.Width(200));
-        GUILayout.Label("Maximální výška hor = " + maxHeight, GUILayout.ExpandWidth(false));
+        GUILayout.Label("Maximální výška hor = " + maxHeight + " m", GUILayout.ExpandWidth(false));
         maxHeight = GUILayout.HorizontalSlider(maxHeight, 0, maxSlider, GUILayout.Width(200));
 
-
-
-
-        tessellation = GUILayout.Toggle(tessellation, "Teselace na odstranení popping efektu");
+        tessellation = GUILayout.Toggle(tessellation, "Teselace na odstranění popping efektu");
 
         GUILayout.EndArea();
        
@@ -80,7 +84,7 @@ public class SceneManager : MonoBehaviour
 
         PlanetData.PlanetDiameter = Height;
         PlanetData.MaxPlanetHeight = maxHeight;
-        PlanetData.IsTessellation = tessellation;
+        PlanetData.IsTessellation = tessellation;*/
     }
 
 }

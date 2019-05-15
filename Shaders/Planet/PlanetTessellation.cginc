@@ -111,7 +111,7 @@ DS_OUTPUT DS(HS_CONSTANT_OUTPUT input, OutputPatch<HS_OUTPUT, 3> ip, float3 b : 
 	o.uv = ip[0].uv*b.x + ip[1].uv*b.y + ip[2].uv*b.z;
 	o.normal = normalize(ip[0].normal*b.x + ip[1].normal*b.y + ip[2].normal*b.z);
 	o.normal2 = ip[0].normal2*b.x + ip[1].normal2*b.y + ip[2].normal2*b.z;
-	o.height = ip[0].height*b.x + ip[1].height*b.y + ip[2].height*b.z;
+	o.height = ip[0].height*b.x + ip[1].height*b.y + ip[2].height*b.z; 
 
 	/// Výpoèet UV souøadnic 
 	double3 normal = normalize(double3(vertex.x, vertex.y, vertex.z));

@@ -93,13 +93,13 @@
 				float dist = (distance(float3(0, 0, 0), _WorldSpaceCameraPos)) - _PlanetInfo.x ;
 				float blenderIndex = 1;
 
-				if ((63710 * 0.2f) > dist) {
-					float smallDistance = (63710 * 0.1f);
+				if ((_PlanetInfo.x * 0.2f) > dist) {
+					float smallDistance = (_PlanetInfo.x * 0.1f);
 					if (smallDistance > dist) {
 						blenderIndex = 1;
 					}
 					else {
-						dist = (63710 * 0.2f) - dist;
+						dist = (_PlanetInfo.x * 0.2f) - dist;
 						blenderIndex = dist / (smallDistance);
 					}
 

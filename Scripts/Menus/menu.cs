@@ -32,7 +32,7 @@ public class menu : MonoBehaviour
         slider.minValue = PlanetData.MinPlanetRadius;
         slider.maxValue = PlanetData.MaxPlanetRadius;
         slider.value = PlanetData.PlanetDiameter;
-
+        chunkSize = 16;
         chunkSizeText.text = "Detailnost Dlaždice = 16";
     }
 

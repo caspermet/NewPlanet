@@ -60,11 +60,15 @@ public class FlyCamera
     private void SetCameraNewPosition()
     {
 
-        if (planerRadius - PlanetData.PlanetRadius < 0 && PlanetData.ViewDistanceFromeEarth < PlanetData.PlanetRadius * 0.3f )
+        if (planerRadius - PlanetData.PlanetRadius < 0 && PlanetData.ViewDistanceFromeEarth < PlanetData.PlanetRadius * 0.4f )
         {
          
             float height = PlanetData.PlanetRadius - planerRadius;
-            camera.transform.position = (camera.transform.position + camera.transform.position.normalized * (height * 0.95f));
+            if(PlanetData.ViewDistanceFromeEarth > PlanetData.PlanetRadius * 0.3f)
+            {
+                height *= 0.97f;
+            }
+            camera.transform.position = (camera.transform.position + camera.transform.position.normalized * (height));
         }
         planerRadius = PlanetData.PlanetRadius;
     }

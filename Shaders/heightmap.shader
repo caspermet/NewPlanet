@@ -36,7 +36,7 @@
 			void vert(inout appdata_full v) {
 
 				float4 wolrldPosition = mul(unity_ObjectToWorld, v.vertex);
-				v.vertex.y = tex2Dlod(_MainTex, float4(wolrldPosition.xz / _Scale2, 0, 0)) * 20 / _Scale;
+				v.vertex.y = tex2Dlod(_MainTex, float4(wolrldPosition.xz / _Scale2, 0, 0)) * 400 / 0.5;
 			}
 
 			// Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.

@@ -270,7 +270,7 @@ public class ChunksController
         float current = 0;
         current = Time.frameCount / Time.time;
         avgFrameRate = (int)current;
-       // WriteString(avgFrameRate);
+        WriteString(avgFrameRate);
 
     }
 
@@ -282,18 +282,18 @@ public class ChunksController
         
         float vzdalenost = Vector3.Distance(new Vector3(0,0,0) ,PlanetData.CameraPosition) - PlanetData.PlanetRadius; 
 
-        path = "Assets/test-fps.txt";
+        path = "Assets/test-fps-800-3-t.txt";
         writer = new StreamWriter(path, true);
         writer.WriteLine(fps);
         writer.Close();
 
-        string path2;
+     /*   string path2;
         StreamWriter writer2;
 
         path2 = "Assets/test-vzdalenost.txt";
         writer2 = new StreamWriter(path2, true);
         writer2.WriteLine((int)vzdalenost);
-        writer2.Close();
+        writer2.Close();*/
 
 
     }

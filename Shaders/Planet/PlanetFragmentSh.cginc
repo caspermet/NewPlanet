@@ -61,9 +61,9 @@ float3 calcColor(GM_OUTPUT input, float3 textureColor) {
 	float3 spec = _SpecColor.rgb * pow(max(0, dot(reflect(-lightDirection, normalDirection), viewDirection)), 40);
 
 	
-	diff.x = diff.x < 0.04 ? 0.04 : diff.x;
-	diff.y = diff.y < 0.04 ? 0.04 : diff.y;
-	diff.z = diff.z < 0.04 ? 0.04 : diff.z;
+	diff.x = diff.x < 0.03 ? 0.03 : diff.x;
+	diff.y = diff.y < 0.03 ? 0.03 : diff.y;
+	diff.z = diff.z < 0.03 ? 0.03 : diff.z;
 
 	//difuzní + ambientni složka
 	float3 c = diff * pow(textureColor, _Gamma);
@@ -71,7 +71,7 @@ float3 calcColor(GM_OUTPUT input, float3 textureColor) {
 	// Lesklá složka
 	c += spec * diff * pow(tex2D(_SpecMap, input.uv.xy).r, _Gamma);
 
-	c = 1.0 - exp(c * -2);
+	c = 1.0 - exp(c * -6);
 
 	c = pow(c, 1.4f );
 
@@ -93,11 +93,20 @@ float3 ShowLODSystem(float height) {
 	else if (interpolar < 0.04 && interpolar > 0.02) {
 		return float4(0.2 + interpolar, 1, interpolar * 1 + 0.4, 1.0);
 	}
-	else if (interpolar <= 0.02 && interpolar > 0.002) {
-		return float4(0.5 , 0.2 + interpolar * 20, 0.2 + interpolar * 20, 1.0);
+	else if (interpolar <= 0.02 && interpolar > 0.008) {
+		return float4(0.8 , 0.2 + interpolar * 20, 0.2 + interpolar * 20, 1.0);
 	}
-	else if (interpolar < 0.002 && interpolar > 0.0001) {
+	else if (interpolar <= 0.008 && interpolar > 0.004) {
+		return float4(0.2, 0.2 + interpolar * 20, 0.4 + interpolar * 20, 1.0);
+	}
+	else if (interpolar <= 0.004 && interpolar > 0.002) {
+		return float4(0.4, 0.5 + interpolar * 20, 0.4 + interpolar * 20, 1.0);
+	}
+	else if (interpolar < 0.002 && interpolar > 0.001) {
 		return float4(0.3 + interpolar * 50, 0.2 + interpolar * 100, 0.4, 1.0);
+	}
+	else if (interpolar < 0.001 && interpolar > 0.0001) {
+		return float4(0.7 + interpolar * 50, 0.2 + interpolar * 100, 0.4, 1.0);
 	}
 	else if (interpolar <= 0.0001) {
 		return float4(interpolar * 500, 0.6, 0.5 - interpolar * 200, 1.0);

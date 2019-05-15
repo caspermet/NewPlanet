@@ -17,6 +17,7 @@ public class PlanetController : MonoBehaviour
     public Texture2D planetHeightMap;
     public Texture2D planetSpecular;
 
+    public Material subPlanetMaterial;
 
     public Texture2D[]texture;
 
@@ -96,6 +97,7 @@ public class PlanetController : MonoBehaviour
     {
         sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         sphere.AddComponent<BoxCollider>();
+        sphere.GetComponent<MeshRenderer>().material = subPlanetMaterial;
         sphere.transform.localScale = new Vector3(planetInfo.x * 1.95f, planetInfo.x * 1.95f, planetInfo.x * 1.95f);
     }
 
@@ -105,7 +107,7 @@ public class PlanetController : MonoBehaviour
 
         cameraController.cameraUpdate();
         chunk.Update(instanceMaterials, materialBlock, PlanetData.PlanetDiameter);
-
+     
     }
 
     void OnDisable()
