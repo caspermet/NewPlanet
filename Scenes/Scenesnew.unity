@@ -266,13 +266,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 431095061}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0.11606401, y: 0, z: 0, w: 0.9932418}
   m_LocalPosition: {x: -64.81052, y: 72.589386, z: 40.474895}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -13.33, y: 0, z: 0}
 --- !u!124 &431095065
 Behaviour:
   m_ObjectHideFlags: 0
@@ -299,10 +299,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 837509111}
-  - component: {fileID: 837509110}
-  - component: {fileID: 837509112}
   - component: {fileID: 837509113}
-  - component: {fileID: 837509114}
   - component: {fileID: 837509115}
   m_Layer: 0
   m_Name: ScenaManager
@@ -311,20 +308,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &837509110
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 837509109}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07aaf0a428316624294a34c1a154c62b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainMenuHolder: {fileID: 0}
-  optionsMenuHolder: {fileID: 0}
-  value: 0
 --- !u!4 &837509111
 Transform:
   m_ObjectHideFlags: 0
@@ -338,20 +321,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &837509112
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 837509109}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07aaf0a428316624294a34c1a154c62b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainMenuHolder: {fileID: 0}
-  optionsMenuHolder: {fileID: 0}
-  value: 0
 --- !u!114 &837509113
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,17 +334,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pauseMenuUI: {fileID: 2083947792}
   isPaused: 0
---- !u!114 &837509114
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 837509109}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77cd8edd3b1571f458d336256a4d4f7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &837509115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -509,14 +467,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7508601c770a1bf42afc036f20f45db8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  noise: 20
-  width: 20
-  clouds: {fileID: 2100000, guid: 2aeafb810fc5b2a4697f48608feb9e13, type: 2}
   camera: {fileID: 431095063}
-  maxScale: 127420
-  chunkSize: 16
-  maxTerrainHeight: 1000
-  planetTexture: {fileID: 2800000, guid: 5cb9eef9c196c6e43ac77f6b50552db4, type: 3}
+  chunkSize: 32
+  planetTexture: {fileID: 2800000, guid: c2fac257a6a7def40b0ba259a3842eeb, type: 3}
   planetHeightMap: {fileID: 2800000, guid: 0129ec5223a8ac442802fc169b23a691, type: 3}
   planetSpecular: {fileID: 2800000, guid: 53c6929262f403044b88ab04ac868975, type: 3}
   texture:
@@ -527,17 +480,6 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 7b46152e0f6fc3045b645b969c9dad3a, type: 2}
   - {fileID: 2100000, guid: 495c30b4c3a649d4a9f481f1c9d15516, type: 2}
   - {fileID: 2100000, guid: 495c30b4c3a649d4a9f481f1c9d15516, type: 2}
-  normalMapss: {fileID: 0}
-  angle: 0
-  layers:
-  - texture: {fileID: 2800000, guid: cf663cfdec1b7cc4484cbd8db0a03f55, type: 3}
-    tintStrength: 0
-    startAngle: 0.03
-    blendStrength: 0
-  - texture: {fileID: 2800000, guid: 6e3a29a6ba1a9b44ba7449c04964ca44, type: 3}
-    tintStrength: 0
-    startAngle: 0.12
-    blendStrength: 1
 --- !u!1 &1937354030
 GameObject:
   m_ObjectHideFlags: 0

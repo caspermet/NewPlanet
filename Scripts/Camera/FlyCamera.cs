@@ -34,14 +34,14 @@ public class FlyCamera
     {
         Screen.lockCursor = true;
         this.camera = camera;
-        this.planerRadius = planerRadius;
-        maxSpeed = planerRadius * 0.5f;
+        this.planerRadius = PlanetData.PlanetRadius;
+        maxSpeed = planerRadius * 0.8f;
     }
 
     private void SetSpeedByDistance()
     {
         float cameraDistanc = Vector3.Distance(camera.transform.position, new Vector3(0, 0, 0));
-       
+        planerRadius = PlanetData.PlanetRadius;
         cameraDistanc = cameraDistanc - PlanetData.PlanetRadius;
         maxSpeed = PlanetData.PlanetRadius * 0.5f;
 
@@ -57,14 +57,29 @@ public class FlyCamera
             }
         }
     }
-
-    public void SetPlanetRadius(float radius)
+    private void SetCameraNewPosition()
     {
-        planerRadius = radius;
+
+        if (planerRadius - PlanetData.PlanetRadius < 0 && PlanetData.ViewDistanceFromeEarth < PlanetData.PlanetRadius * 0.3f )
+        {
+         
+            float height = PlanetData.PlanetRadius - planerRadius;
+            camera.transform.position = (camera.transform.position + camera.transform.position.normalized * (height * 0.95f));
+        }
+        planerRadius = PlanetData.PlanetRadius;
+    }
+
+    public void MenuUpdate()
+    {
+        if (PlanetData.PlanetRadius != planerRadius)
+        {
+            SetCameraNewPosition();
+        }
     }
 
     public void Update()
     {
+
         SetSpeedByDistance();
 
         Vector2 mouse = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));

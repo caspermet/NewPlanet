@@ -196,7 +196,7 @@ public class ChunkFace
 
 
         int suma = (int)(edge.x + edge.y + edge.z + edge.w);
-        rotate = CalculRotate.CalculRotateOfMesh(edge, suma);
+        rotate = CalculateRotation.CalculateRotateOfMesh(edge, suma);
 
         newDirection.w += rotate;
         if (suma > 3)
@@ -513,4 +513,5 @@ public class ChunkFace
     {
         generated = isGenerate;
     }
+  
 }

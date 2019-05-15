@@ -11,7 +11,8 @@ public static class FrustumCulling
           {
               return false;
           }*/
-
+          
+       
 
         float maxHeight = PlanetData.MaxPlanetHeight;
         Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
@@ -29,8 +30,14 @@ public static class FrustumCulling
     {
 
         Vector3 viewDirection = PlanetData.CameraPosition - position;
+        float angle = 120;
+        
+        if(PlanetData.ViewDistanceFromeEarth < PlanetData.PlanetRadius * 0.2f)
+        {
+            angle = 95;
+        }
 
-        if (Vector3.Angle(position.normalized, viewDirection) > 120)
+        if (Vector3.Angle(position.normalized, viewDirection) > angle)
         {
             return false;
         }

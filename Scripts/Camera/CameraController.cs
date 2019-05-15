@@ -28,11 +28,14 @@ public class CameraController
 
     public void cameraUpdate()
     {
-        if(MenuData.IsPause == true)
+
+        if (MenuData.IsPause == true)
         {
+            flyCamera.MenuUpdate();
+            EditFarPlane();
             return;
         }
-
+     
         if (Input.GetKeyDown(KeyCode.T))
         {
             PlanetData.IsLODActive = !PlanetData.IsLODActive;
@@ -61,6 +64,5 @@ public class CameraController
     public void setDistance(float distance)
     {
         this.distance = distance;
-        flyCamera.SetPlanetRadius(distance);
     }
 }

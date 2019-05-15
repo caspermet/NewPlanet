@@ -1,22 +1,3 @@
-float _Tess;
-float _TessMin;
-float _TessMax;
-float _Tesss;
-sampler2D _MainTex;
-sampler2D _HeightTex;
-float _FlipNoise;
-float _noiseHeight;
-float _rotate;
-float _textureblend;
-
-/**************
-water
-*****************/
-
-sampler2D _WaterMainTex, _WaterFlowMap, _WaterNormalMap, _DerivHeightMap;;
-float _WaterTiling, _WaterSpeed, _WaterFlowStrength, _WaterFlowOffset, _Value;
-fixed4 _WaterColor;
-
 /*********************
 light
 */
@@ -31,17 +12,30 @@ uniform sampler2D _SpecMap;
 Variablec from scripts
 ************/
 
-float3 _CameraPosition;
-sampler2D _noiseTexture;
-sampler2D _SpecularMap;
-float fHdrExposure;
-float _Gamma;
-int _IsLODActive;
+float3		_CameraPosition;
+sampler2D	_noiseTexture;
+sampler2D	_SpecularMap;
+float		fHdrExposure;
+float		_Gamma;
+int			_IsLODActive;
+int			_IsTessellation;
 
 
 /**********************
 buffery for instancing
-***************/
+
+positionBuffer
+		x -> x - souøadnici daného meshe
+		y -> y - souøadnici daného meshe
+		z -> z - souøadnici daného meshe
+		w -> scale daného meshe
+
+directionsBuffer
+		x -> x - normála meshe
+		y -> y - normála meshe
+		z -> z - normála meshe
+		w -> rotace daného meshe
+******/
 StructuredBuffer<float4> positionBuffer;
 StructuredBuffer<float4> directionsBuffer;
 
@@ -49,9 +43,7 @@ StructuredBuffer<float4> directionsBuffer;
 HeightMap textures
 ************************/
 sampler2D _PlanetTextures;
-/*
-UNITY_DECLARE_TEX2DARRAY(_PlanetHeightMapTop);
-UNITY_DECLARE_TEX2DARRAY(_PlanetHeightMapBottom);*/
+
 
 /*********************************
 Planet Textures in fragment shade
@@ -59,9 +51,7 @@ Planet Textures in fragment shade
 sampler2D _PlanetHeightMap;
 sampler2D _PlanetNormalMap;
 
-/*
-UNITY_DECLARE_TEX2DARRAY(_PlanetTexturesTop);
-UNITY_DECLARE_TEX2DARRAY(_PlanetTexturesBottom);*/
+
 UNITY_DECLARE_TEX2DARRAY(_SurfaceTexture);
 
 /*****************************************************************
@@ -92,9 +82,7 @@ struct VS_OUTPUT
 	float3 normal2 : NORMAL2;
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
-	float tess : TEXCOORD2;
 	float height : TEXCOORD3;
-	float angle : TEXCOORD4;
 };
 
 struct HS_OUTPUT
@@ -104,9 +92,7 @@ struct HS_OUTPUT
 	float3 normal2 : NORMAL2;
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
-	float tess : TEXCOORD2;
 	float height : TEXCOORD3;
-	float angle : TEXCOORD4;
 };
 
 struct DS_OUTPUT
@@ -117,7 +103,6 @@ struct DS_OUTPUT
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
 	float height : TEXCOORD2;
-	float angle : TEXCOORD4;
 };
 struct GM_OUTPUT
 {
@@ -127,7 +112,6 @@ struct GM_OUTPUT
 	float2 uv : TEXCOORD0;
 	float4 wordPosition : TEXCOORD1;
 	float height : TEXCOORD2;
-	float angle : TEXCOORD4;
 };
 
 

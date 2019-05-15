@@ -4,21 +4,15 @@ using UnityEngine;
 using System.IO;
 using System.Linq;
 
+
 public class PlanetController : MonoBehaviour
 {
-    public float noise = 20;
-    public float width = 20;
-
-    public Material clouds;
     public Camera camera;
-
-    public float maxScale;
-
-    public int chunkSize = 50;
-    public float maxTerrainHeight;
 
     private Vector3 planetInfo;
 
+
+    /// Vyskova mapa planety, textura planety a specularni slozka
     public Texture2D planetTexture;
     public Texture2D planetHeightMap;
     public Texture2D planetSpecular;
@@ -26,38 +20,42 @@ public class PlanetController : MonoBehaviour
 
     public Texture2D[]texture;
 
+    // instance materialu pro meshe
     public Material[] instanceMaterials;
 
     private float gamma = 1.0f;
     private float hdrExposure = 1.0f;
 
     private GameObject sphere;
+
+    // Instance Chunk controleru
     private ChunksController chunk;
+
+    // Instace Controlleru camery
     private CameraController cameraController;
+
+    // Material block, který je přidán do isntace
     private MaterialPropertyBlock materialBlock;
 
-    public Texture2D normalMapss;
-    public int angle;
-
-    public Layer[] layers;
+    private int width = 10;
+    private int noise = 10;
 
     void Start()
     {
         planetInfo.x = PlanetData.PlanetRadius;
         planetInfo.y = PlanetData.MaxPlanetHeight;
         PlanetData.CameraPosition = camera.transform.position;
-        // PlanetData.PlanetRadius = planetInfo.x;
-        //PlanetData.MaxPlanetHeight = planetInfo.y;
-        // normalMapss = CreateNormalMap.NormalMap(planetHeightMap, 1);
-        // normalMapss = LoadPNG("Assets/Map/gebco_08_rev_elev_21600x10800.png");
-       // CreateSpehere();
-  
+        CreateSpehere();
+
+
         cameraController = new CameraController(camera, PlanetData.PlanetRadius);
 
         SetMaterialProperties();
-        chunk = new ChunksController(PlanetData.PlanetDiameter, chunkSize, instanceMaterials, camera, materialBlock);
+        chunk = new ChunksController(PlanetData.PlanetDiameter, instanceMaterials, camera, materialBlock);
+      
     }
 
+    // nastaví přoměné které se pošlou na grafickou kartu
     void SetMaterialProperties()
     {
         materialBlock = new MaterialPropertyBlock();
@@ -66,59 +64,48 @@ public class PlanetController : MonoBehaviour
         materialBlock.SetTexture("_PlanetTextures", planetTexture);
         materialBlock.SetTexture("_PlanetHeightMap", planetHeightMap);
         materialBlock.SetTexture("_PlanetSpecular", planetSpecular);
-        // materialBlock.SetTexture("_PlanetNormalMap", normalMapss);
 
-        materialBlock.SetTexture("_noiseTexture", PerlingNoise.CreateNoise((int)width, noise));
+       // materialBlock.SetTexture("_noiseTexture", PerlingNoise.CreateNoise((int)width, noise));
 
         materialBlock.SetVector("_CameraPosition", camera.transform.position);
         materialBlock.SetVector("_PlanetInfo", planetInfo);
         materialBlock.SetFloat("_Gamma", gamma);
         materialBlock.SetFloat("fHdrExposure", hdrExposure);
-        materialBlock.SetInt("_IsLODActive", 0);
+        materialBlock.SetInt("_IsLODActive", 0);     
+    }
 
-        materialBlock.SetInt("layerCount", layers.Length);
-        materialBlock.SetFloatArray("baseStartHeights", layers.Select(x => x.startAngle).ToArray());
-        materialBlock.SetFloatArray("baseBlends", layers.Select(x => x.blendStrength).ToArray());
-        materialBlock.SetFloatArray("baseColourStrength", layers.Select(x => x.tintStrength).ToArray());
+    void UpdateData()
+    {
+        PlanetData.CameraPosition = camera.transform.position;
+        cameraController.setDistance(PlanetData.PlanetRadius);
 
-        Texture2DArray texturesArray = LoadArrayTexture.DoTexture(layers.Select(x => x.texture).ToArray());
-        materialBlock.SetTexture("baseTextures", texturesArray);
+        PlanetData.ViewDistanceFromeEarth = Vector3.Distance(new Vector3(0, 0, 0), PlanetData.CameraPosition) - PlanetData.PlanetRadius;
+       
+        planetInfo.x = PlanetData.PlanetRadius;
+        planetInfo.y = PlanetData.MaxPlanetHeight;
+
+        materialBlock.SetVector("_CameraPosition", camera.transform.position);
+        materialBlock.SetInt("_IsLODActive", (PlanetData.IsLODActive == false ? 0 : 1));
+        materialBlock.SetVector("_PlanetInfo", planetInfo);
+        materialBlock.SetInt("_IsTessellation", PlanetData.IsTessellation == true ? 1 : 0 );
+
+        sphere.transform.localScale = new Vector3(planetInfo.x * 1.95f, planetInfo.x * 1.95f, planetInfo.x * 1.95f);
     }
 
     void CreateSpehere()
     {
         sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //   sphere.GetComponent<MeshRenderer>().material = clouds;
-        sphere.transform.localScale = new Vector3(planetInfo.x * 2.3f, planetInfo.x * 2.3f, planetInfo.x * 2.3f);
+        sphere.AddComponent<BoxCollider>();
+        sphere.transform.localScale = new Vector3(planetInfo.x * 1.95f, planetInfo.x * 1.95f, planetInfo.x * 1.95f);
     }
-
-
-
 
     void Update()
     {
-        planetInfo.x = PlanetData.PlanetRadius;
-        planetInfo.y = PlanetData.MaxPlanetHeight;
-        PlanetData.CameraPosition = camera.transform.position;
-        PlanetData.Angle = angle;
-      
-        cameraController.setDistance(PlanetData.PlanetRadius);
-        materialBlock.SetVector("_CameraPosition", camera.transform.position);
-        materialBlock.SetInt("_IsLODActive", (PlanetData.IsLODActive == false ? 0 : 1));
-        materialBlock.SetVector("_PlanetInfo", planetInfo);
-
-        materialBlock.SetInt("layerCount", layers.Length);
-        materialBlock.SetFloatArray("baseStartHeights", layers.Select(x => x.startAngle).ToArray());
-        materialBlock.SetFloatArray("baseBlends", layers.Select(x => x.blendStrength).ToArray());
-        materialBlock.SetFloatArray("baseColourStrength", layers.Select(x => x.tintStrength).ToArray());
-
-      /*  Texture2DArray texturesArray = LoadArrayTexture.DoTexture(layers.Select(x => x.texture).ToArray());
-        materialBlock.SetTexture("baseTextures", texturesArray);*/
-
-
+        UpdateData();
 
         cameraController.cameraUpdate();
-        chunk.Update(instanceMaterials, materialBlock, PlanetData.PlanetDiameter); 
+        chunk.Update(instanceMaterials, materialBlock, PlanetData.PlanetDiameter);
+
     }
 
     void OnDisable()
@@ -126,15 +113,4 @@ public class PlanetController : MonoBehaviour
         chunk.Disable();
     }
 
-    [System.Serializable]
-    public class Layer
-    {
-        public Texture2D texture;
-        [Range(0, 1)]
-        public float tintStrength;
-        [Range(0, 1)]
-        public float startAngle;
-        [Range(0, 1)]
-        public float blendStrength;
-    }
 }

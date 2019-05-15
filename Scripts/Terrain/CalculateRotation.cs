@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class CalculRotate{
+public static class CalculateRotation
+{
 
-	public static int CalculRotateOfMesh(Vector4 edge, int suma)
+	public static int CalculateRotateOfMesh(Vector4 edge, int suma)
     {
         int rotate = 0;
         switch (suma)

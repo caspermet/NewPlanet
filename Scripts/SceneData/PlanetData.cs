@@ -5,15 +5,22 @@ using UnityEngine;
 public static class PlanetData
 {
 
-    private static float planetRadius = 7463 / 2;
-    private static float planetDiameter = 7463 ;
-    private static float maxPlanetHeight = 1;
+    private static float planetRadius = 100000 / 2;
+    private static float planetDiameter = 100000;
 
-    private static float minPlanetRadius = 100;
-    private static float maxPlanetRadius = 65536*4;
+    private static float maxPlanetHeight = 100000 * 0.01f;
+
+    private static float minPlanetRadius = 10000;
+    private static float maxPlanetRadius = 2000000;
+
+    private static float chunkSize = 16;
+
+
     private static bool isLODActive = false;
     private static Vector3 cameraPosition;
     private static int angle;
+    private static bool isTessellation;
+    private static float viewDistanceFromeEarth;
 
     public static float PlanetRadius
     {
@@ -38,6 +45,17 @@ public static class PlanetData
             cameraPosition = value;
         }
     }
+     public static float ViewDistanceFromeEarth
+    {
+        get
+        {
+            return viewDistanceFromeEarth;
+        }
+        set
+        {
+            viewDistanceFromeEarth = value;
+        }
+    }
 
     public static int Angle
     {
@@ -50,6 +68,19 @@ public static class PlanetData
             angle = value;
         }
     }
+
+    public static float ChunkSize
+    {
+        get
+        {
+            return chunkSize;
+        }
+        set
+        {
+            chunkSize = value;
+        }
+    }
+
 
     public static float PlanetDiameter
     {
@@ -98,6 +129,17 @@ public static class PlanetData
         set
         {
             isLODActive = value;
+        }
+    }
+    public static bool IsTessellation
+    {
+        get
+        {
+            return isTessellation;
+        }
+        set
+        {
+            isTessellation = value;
         }
     }
 }
