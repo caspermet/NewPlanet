@@ -1,11 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/**************
+ * Ovládání kamery
+ * 
+ * 
+ * 
+ * ********************/
+
 public class FlyCamera
 {
 
     private float cameraSensitivity = 60;
-    private float climbSpeed = 4;
     private float normalMoveSpeed = 10;
     private float slowMoveFactor = 0.25f;
     private float fastMoveFactor = 3;
@@ -19,25 +25,18 @@ public class FlyCamera
     private float planerRadius;
 
     private Camera camera;
-    private float rotationX = 0.0f;
-    private float rotationY = 0.0f;
-
-    /************************************
-     * sun rotate
-     * */
-
-    private Transform sun;
-    public float sunRotSpeed = 1.0f;
 
 
     public FlyCamera(Camera camera, float planerRadius)
     {
-        Screen.lockCursor = true;
+        Cursor.visible = false;
+
         this.camera = camera;
         this.planerRadius = PlanetData.PlanetRadius;
         maxSpeed = planerRadius * 0.8f;
     }
 
+    // úroveŇ rychlosti pozorovatele závisí na jeho vzdálenosti ku povrchu, kde se smenšující vzdáleností klesá i rychlost pohyby kamery
     private void SetSpeedByDistance()
     {
         float cameraDistanc = Vector3.Distance(camera.transform.position, new Vector3(0, 0, 0));
@@ -57,6 +56,8 @@ public class FlyCamera
             }
         }
     }
+
+    // Aby uživatel neskončil v planetě při zvětšování poloměru, tak při určité vzdálenosti se začne posunovat s tím jak se zvětšuje planeta
     private void SetCameraNewPosition()
     {
 
@@ -64,10 +65,7 @@ public class FlyCamera
         {
          
             float height = PlanetData.PlanetRadius - planerRadius;
-            if(PlanetData.ViewDistanceFromeEarth > PlanetData.PlanetRadius * 0.3f)
-            {
-                height *= 0.97f;
-            }
+  
             camera.transform.position = (camera.transform.position + camera.transform.position.normalized * (height));
         }
         planerRadius = PlanetData.PlanetRadius;
@@ -81,6 +79,8 @@ public class FlyCamera
         }
     }
 
+
+    //Zde probíhá pohyb kamery
     public void Update()
     {
 
@@ -117,7 +117,7 @@ public class FlyCamera
 
         if (Input.GetKeyDown(KeyCode.End))
         {
-            Screen.lockCursor = (Screen.lockCursor == false) ? true : false;
+            Cursor.visible = (Cursor.visible == false) ? true : false;
         }
     }
 }

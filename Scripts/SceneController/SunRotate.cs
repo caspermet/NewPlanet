@@ -7,6 +7,7 @@ public class SunRotate : MonoBehaviour
     public float sunRotateSpeed = 10.0f;
     public Transform sun;
 
+    // rotace slunce
     void Update()
     {
 

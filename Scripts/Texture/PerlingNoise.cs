@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public static class PerlingNoise  {
-
+    /***************
+     * Případné rozšíření aplikace o perling noise
+     * 
+     * ***********************/
 
     public static Texture2D CreateNoise(int size, float scale)
     {

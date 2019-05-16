@@ -1,24 +1,6 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
 
-
-double3 RotateNormal(double3 vector1, double3 vector2, double3 vector3) {
-	double3 n = cross(vector1, vector2);
-
-	double vm1 = sqrt(n.x*n.x + n.y*n.y + n.z*n.z);
-
-	n = normalize(n / (vm1));
-
-	double angle = acos(dot(vector1, vector2));
-
-	double s = sin(angle);
-	double c = cos(angle);
-
-	double3x3 matrixx = (
-		n.x * n.x * (1 - c) + c       , n.y * n.x * (1 - c) - s * n.z, n.x * n.z * (1 - c) + s * n.y,
-		n.x * n.y * (1 - c) + s * n.z , n.y * n.y * (1 - c) + c      , n.y * n.z * (1 - c) - s * n.x,
-		n.x * n.z * (1 - c) - s * n.y , n.y * n.z * (1 - c) + s * n.x, n.z * n.z * (1 - c) + c);
-
-	return mul(matrixx, normalize(vector3));
-}
 
 
 double3x3 RotateAroundYInDegrees(double degrees)
@@ -107,7 +89,6 @@ VS_OUTPUT VS(APP_OUTPUT v, uint instanceID : SV_InstanceID)
 
 	// Pøidání výšky  k pozici vertexu
 	worldPosition.xyz = (worldPosition + n * (height * _PlanetInfo.y));
-
 
 	
 	o.wordPosition = double4(worldPosition, 1.0f);

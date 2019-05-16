@@ -3,6 +3,14 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+
+/****************************
+ * Metody na ovládání prvotniho menu
+ * 
+ * 
+ * 
+ * **************************************/
+
 public class menu : MonoBehaviour
 {
     public GameObject mainMenuHolder;
@@ -36,6 +44,7 @@ public class menu : MonoBehaviour
         chunkSizeText.text = "Detailnost Dlaždice = 16";
     }
 
+    //uloží všechno data, který získal od uživatele a hlavní scénu
     public void Play()
     {
         MenuData.PlanetRadius = value;
@@ -49,11 +58,14 @@ public class menu : MonoBehaviour
       
     }
 
+    //Ukončí aplikaci
     public void Quic()
     {
         Application.Quit();
     }
 
+
+    //nastavi průmer planety
     public void SetRadiusOfPlanet(float valuee)
     {
 
@@ -71,6 +83,7 @@ public class menu : MonoBehaviour
         maxPlanetheight = valuee;
     }
 
+    //nastaví hodnotu chunku
     public void SetChunkSize(float valuee)
     {
 
@@ -78,6 +91,8 @@ public class menu : MonoBehaviour
         chunkSize = (int)valuee;
     }
 
+
+    //Jestli má probíhat tesselace pro částečné odstranění popping efektu
     public void SetTessellation(bool valuee)
     {
        

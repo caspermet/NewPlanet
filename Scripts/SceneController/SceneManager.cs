@@ -1,6 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/****************
+ * Stará se o vykreslení uživatelského rozhraní a manipulaci s ním
+ * 
+ * 
+ * 
+ * **********************/
+
 public class SceneManager : MonoBehaviour
 {
     public Material SkyBox;
@@ -15,7 +22,6 @@ public class SceneManager : MonoBehaviour
 
     void Start()
     {
-        Debug.Log(PlanetData.IsMenu);
         if (PlanetData.IsMenu)
         {
             return;
@@ -53,13 +59,15 @@ public class SceneManager : MonoBehaviour
     {
         planetInfo.x = PlanetData.PlanetRadius;
         planetInfo.y = PlanetData.MaxPlanetHeight;
+
+        //shader který má na startost skybox
         SkyBox.SetVector("_PlanetInfo", planetInfo);
         
     }
 
     void OnGUI()
     {
-/*
+        //Samotny layout
         GUILayout.BeginArea(new Rect(0, 0, 280, 180), style);
         maxSlider = Height * 0.01f;
         if(maxHeight > maxSlider)
@@ -81,10 +89,10 @@ public class SceneManager : MonoBehaviour
         GUILayout.EndArea();
        
 
-
+        // získaná se aktualizují
         PlanetData.PlanetDiameter = Height;
         PlanetData.MaxPlanetHeight = maxHeight;
-        PlanetData.IsTessellation = tessellation;*/
+        PlanetData.IsTessellation = tessellation;
     }
 
 }

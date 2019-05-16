@@ -1,6 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
+/*****************************
+
+ * 
+ * Třída má na starost generování meshe, kterému jsou přiřazeny submeshe 
+ * 
+ * **********************************/
 public static class MeshGenerator
 {
 
@@ -139,6 +146,13 @@ public static class MeshGenerator
     }
 }
 
+
+/****************
+ * 
+ *  Struktura, se stará o uložení meshe
+ * 
+ * 
+ * **********************/
 public class MeshData
 {
     public Vector3[] vertices;
@@ -173,6 +187,8 @@ public class MeshData
         mesh.subMeshCount = 4;
     }
 
+
+    
     public void AddTriangle(int a, int b, int c)
     {
         triangles[triangleIndex] = a;

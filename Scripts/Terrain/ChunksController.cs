@@ -13,20 +13,11 @@ using System.IO;
  *****************************/
 public class ChunksController
 {
-
-    private List<Vector4> positionsList = new List<Vector4>();
-    private List<Vector4> directionList = new List<Vector4>();
-
     private List<Vector4>[] positionsListArray = new List<Vector4>[4];
     private List<Vector4>[] directionListArray = new List<Vector4>[4];
 
 
-    private Vector4[] viewedChunkCoord;
     private Vector4[] directionArray;
-
-    private int numberOfEdge = 2;
-    private Vector4[][] chunkCoordArray;
-    private Vector4[][] chunkDirection;
 
     private float scale;
 
@@ -49,19 +40,15 @@ public class ChunksController
     private Vector3[] directionsY;
     private Vector3[] planetRadiusArray;
 
-    static object chunkFaceLock = new object();
-    static object chunkUpdateLock = new object();
-
     private Mesh mesh;
 
     int cubeSize = 6;
+    int meshTypes = 4;
 
     Material instanceMaterial;
     Material[] instanceMaterials;
 
     MaterialPropertyBlock materialBlock;
-
-    public int avgFrameRate;
 
 
 
@@ -86,9 +73,6 @@ public class ChunksController
         viewerPosition = this.viewer.position;
         chunkFace = new ChunkFace[6];
 
-        chunkCoordArray = new Vector4[numberOfEdge][];
-        chunkDirection = new Vector4[numberOfEdge][];
-
         createChunkFaces();
 
         // statická třída, která vytvoří všecchny druhy meshů
@@ -96,13 +80,12 @@ public class ChunksController
 
         // následně vytvoří pro každou z nich Instanci která se stará o posílání dat za pomocí instancigu na grafickou kartu.
         drawMesh = new DrawMeshInstanced[4];
-        drawMesh[0] = new DrawMeshInstanced(mesh);
-        drawMesh[1] = new DrawMeshInstanced(mesh);
-        drawMesh[2] = new DrawMeshInstanced(mesh);
-        drawMesh[3] = new DrawMeshInstanced(mesh);
 
-       
-
+        for (int i = 0; i < meshTypes; i++)
+        {
+            drawMesh[i] = new DrawMeshInstanced(mesh);
+        }
+  
         UpdateChunkMesh();
     }
 
@@ -115,6 +98,8 @@ public class ChunksController
         this.instanceMaterials = instanceMaterials;
         this.materialBlock = materialBlock;
 
+
+        // Jestli se zmenili parametry kamery tak proběhne aktualizace
         if (viewerPositionOld != viewerPosition || viewerRotation != viewerRotationOld || newMaxScale != scale)
         {
             if(newMaxScale != scale)
@@ -127,7 +112,6 @@ public class ChunksController
             viewerRotationOld = viewerRotation;
 
             UpdateChunkMesh();
-            viewedChunkCoord = positionsList.ToArray();
         }
         
         UpdateAllMesh();
@@ -141,7 +125,7 @@ public class ChunksController
     {
         for (int i = 0; i < 6; i++)
         {
-            chunkFace[i] = new ChunkFace(null, planetRadiusArray[i], this.scale, camera, directions[i], directionsY[i], true, i, null);
+            chunkFace[i] = new ChunkFace(null, planetRadiusArray[i], this.scale, camera, directions[i], directionsY[i], true, i);
         }
        
 
@@ -168,6 +152,7 @@ public class ChunksController
         }
     }
 
+    // aktualizace uzlu
     private void UpdateChunkMesh()
     {    
 
@@ -182,6 +167,7 @@ public class ChunksController
      
         for (int i = 0; i < cubeSize; i++)
         {
+            //Po aktualizaci je dulezite načist data pro vykreslení terénu
             List<Vector4>[] pom;
             List<Vector4>[] pomDir;
             pom = chunkFace[i].findAllChunkToDraw();
@@ -218,83 +204,32 @@ public class ChunksController
         }
     }
 
+
+    // Funkce volá instancing pro vykresleni všech dlazdic
     private void UpdateAllMesh()
     {
-        int lenght = 0;
+        //jsou 4 druhy meshu, ktere mohou byt vykresleny
         for (int i = 0; i < 4; i++)
         {
             Vector4[] viewedChunkCoordd;
             Vector4[] directionArray;
 
-            viewedChunkCoordd = positionsListArray[i].ToArray();
+            viewedChunkCoordd = positionsListArray[i].ToArray(); 
             directionArray = directionListArray[i].ToArray();
 
             if (viewedChunkCoordd.Length > 0)
             {       
                 drawMesh[i].UpdateData(viewedChunkCoordd.Length, viewedChunkCoordd, directionArray, i, instanceMaterials[i], materialBlock);
                 drawMesh[i].Draw();
-                lenght += viewedChunkCoordd.Length;
             }
-        }
-        Frame(15 * 15 * 2 * lenght);
-    }
-
-    private void GetActiveChunksFromChunkTree(ref List<ChunkFace> chunkFaceList, ChunkFace chunkTree)
-    {
-        if (chunkTree.getChunkTree() != null)
-        {
-            for (int i = 0; i < chunkTree.getChunkTree().Length; i++)
-            {
-                GetActiveChunksFromChunkTree(ref chunkFaceList, chunkTree.getChunkTree()[i]);
-            }
-        }
-        else
-        {
-            chunkFaceList.Add(chunkTree);
         }
     }
 
     public void Disable()
-    {
-       
+    {    
         foreach (var item in drawMesh)
         {
             item.Disable();
         }
-  
-    }
-
-
-    void Frame(int lenght)
-    {
-        float current = 0;
-        current = Time.frameCount / Time.time;
-        avgFrameRate = (int)current;
-        WriteString(avgFrameRate);
-
-    }
-
-    public void WriteString(int fps)
-    {
-        string path;
-        StreamWriter writer;
-
-        
-        float vzdalenost = Vector3.Distance(new Vector3(0,0,0) ,PlanetData.CameraPosition) - PlanetData.PlanetRadius; 
-
-        path = "Assets/test-fps-800-3-t.txt";
-        writer = new StreamWriter(path, true);
-        writer.WriteLine(fps);
-        writer.Close();
-
-     /*   string path2;
-        StreamWriter writer2;
-
-        path2 = "Assets/test-vzdalenost.txt";
-        writer2 = new StreamWriter(path2, true);
-        writer2.WriteLine((int)vzdalenost);
-        writer2.Close();*/
-
-
     }
 }

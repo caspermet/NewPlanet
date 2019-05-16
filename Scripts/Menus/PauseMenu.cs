@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
+// Trida na pouze menu
 public class PauseMenu : MonoBehaviour {
     [SerializeField] private GameObject pauseMenuUI;
 
@@ -16,7 +19,7 @@ public class PauseMenu : MonoBehaviour {
         if (isPaused)
         {
             ActiveMenu();
-            Screen.lockCursor = false;
+            Cursor.visible = false;
         }
         else
         {

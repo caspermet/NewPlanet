@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Threading;
 
-
+/*********
+ * Třída která ovládá třídu FlyXAmera
+ * 
+ * 
+ * 
+ * *********/
 public class CameraController
 {
 
@@ -23,44 +28,33 @@ public class CameraController
 
     public void SetDefaultCameraPosition()
     {
-       // camera.transform.position = new Vector3(0, 0, -(distance * 1.5f));
-      //  camera.transform.position = new Vector3(-10044, 98016, 178611);
-       // camera.transform.position = new Vector3(1424457, 1426233, 165498);
-        camera.transform.position = new Vector3(3445624, 3445624, 2477373);
-      //  camera.transform.Rotate(33, -95, -70);
-       // camera.transform.Rotate(28.867f, -143.605f, -84.41801f);
-        camera.transform.Rotate(29.264f, -136.375f, -12.177f);
-        //camera.transform.position = new Vector3(0, 0, -(distance * 1f));
+        camera.transform.position = new Vector3(0, 0, -(distance * 1.5f));
     }
 
     public void cameraUpdate()
     {
-
+        // Když je pauza a uživatel si může upravovat vlastnosti planety
         if (MenuData.IsPause == true)
         {
             flyCamera.MenuUpdate();
             EditFarPlane();
             return;
         }
-     
+
+        // prepina mezi mody zobrazeni
         if (Input.GetKeyDown(KeyCode.T))
         {
             PlanetData.IsLODActive = !PlanetData.IsLODActive;
         }
 
 
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            GUI.enabled = false;
-      
-            PlanetData.IsMenu = !PlanetData.IsMenu;
-        }
-
         Cursor.visible = false;
         flyCamera.Update();
         EditFarPlane();
     }
 
+
+    // S pohybem kamery je vzdálená plocha upravována, tak aby bykla vžd´, tak daljeko jak je hráč od středu planety -- ořezávání zadních ploch
     private void EditFarPlane()
     {
         float farPlanedistance = Vector3.Distance(camera.transform.position, new Vector3(0, 0, 0));

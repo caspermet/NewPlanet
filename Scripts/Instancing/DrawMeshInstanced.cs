@@ -2,7 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DrawMeshInstanced  {
+
+/***************************
+ * Implementace Instancingu
+ * 
+ * 
+ * ***************************************/
+
+public class DrawMeshInstanced
+{
 
     int instanceCount = 100000;
     Mesh instanceMesh;
@@ -19,14 +27,16 @@ public class DrawMeshInstanced  {
 
     public DrawMeshInstanced(Mesh instanceMesh)
     {
-        this.instanceMesh = instanceMesh;      
+        this.instanceMesh = instanceMesh;
 
     }
 
-    public void UpdateData (int instanceCount, Vector4[] positions, Vector4[] directions, int meshIndex, Material instanceMaterial, MaterialPropertyBlock materialPropertyBlock)
+
+    //zde probíhá aktualizace dat
+    public void UpdateData(int instanceCount, Vector4[] positions, Vector4[] directions, int meshIndex, Material instanceMaterial, MaterialPropertyBlock materialPropertyBlock)
     {
 
-        this.instanceCount = instanceCount; 
+        this.instanceCount = instanceCount;
         this.positions = positions;
         this.directions = directions;
         this.subMeshIndex = meshIndex;
@@ -38,29 +48,48 @@ public class DrawMeshInstanced  {
         this.MaterialPropertyBlock = materialPropertyBlock;
 
         UpdateBuffers(instanceMaterial);
-    }   
+    }
 
+
+    //Samotné vykreslení -- 
     public void Draw()
     {
         Graphics.DrawMeshInstancedIndirect(instanceMesh, subMeshIndex, instanceMaterial, new Bounds(Vector3.zero, new Vector3(10000000.0f, 10000000.0f, 10000000.0f)), argsBuffer, 0, MaterialPropertyBlock, UnityEngine.Rendering.ShadowCastingMode.Off);
     }
 
-    public  void UpdateBuffers(Material instanceMaterial)
+
+    //aktualizace buggeru, které jsou následně použity na grafické kartě
+    /**********************
+ buffery for instancing
+
+ positionBuffer
+         x -> x - souřadnici daného meshe
+         y -> y - souřadnici daného meshe
+         z -> z - souřadnici daného meshe
+         w -> scale daného meshe
+
+ directionsBuffer
+         x -> x - normála meshe
+         y -> y - normála meshe
+         z -> z - normála meshe
+         w -> rotace daného meshe
+ ******/
+    public void UpdateBuffers(Material instanceMaterial)
     {
         if (positionBuffer != null)
             positionBuffer.Release();
-      
+
         positionBuffer = new ComputeBuffer(instanceCount, 16);
 
         positionBuffer.SetData(positions);
-   
+
         MaterialPropertyBlock.SetBuffer("positionBuffer", positionBuffer);
         if (directionBuffer != null)
             directionBuffer.Release();
         directionBuffer = new ComputeBuffer(instanceCount, 16);
 
         directionBuffer.SetData(directions);
-      
+
         MaterialPropertyBlock.SetBuffer("directionsBuffer", directionBuffer);
 
         // Indirect args

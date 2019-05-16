@@ -92,7 +92,7 @@
 			{
 				float dist = (distance(float3(0, 0, 0), _WorldSpaceCameraPos)) - _PlanetInfo.x ;
 				float blenderIndex = 1;
-
+				//Zde se rozhoduje jaký SkyBox bude použit posdle relativní vzdálenosti uživatele od povrchu planety -- zde se počítá blendující šást
 				if ((_PlanetInfo.x * 0.2f) > dist) {
 					float smallDistance = (_PlanetInfo.x * 0.1f);
 					if (smallDistance > dist) {

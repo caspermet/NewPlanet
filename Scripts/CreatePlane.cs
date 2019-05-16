@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+//testovací třída
 public class CreatePlane : MonoBehaviour {
     public Material material;
-	// Use this for initialization
+	
 	void Start () {
         for (int x = 0; x < 180; x++)
         {

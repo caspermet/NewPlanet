@@ -2,6 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
+/*****************
+ * Zde probíha kalkulace rotace o kterou se má mesh na grafické kartě otočit
+ * 
+ * suma - počet hran které mají souseda s nižšá úrovní detailu
+ * 
+ * edge - udává přesně jaký sousedi menší detail
+ * 
+ * ******************************/
 public static class CalculateRotation
 {
 

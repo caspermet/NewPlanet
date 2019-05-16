@@ -38,13 +38,15 @@ public class PlanetController : MonoBehaviour
     // Material block, který je přidán do isntace
     private MaterialPropertyBlock materialBlock;
 
-    private int width = 10;
-    private int noise = 10;
 
     void Start()
     {
+        // predaní zakladnich parametru na grafickou kartu
+
         planetInfo.x = PlanetData.PlanetRadius;
         planetInfo.y = PlanetData.MaxPlanetHeight;
+        planetInfo.z = PlanetData.ChunkSize;
+
         PlanetData.CameraPosition = camera.transform.position;
         CreateSpehere();
 
@@ -75,6 +77,7 @@ public class PlanetController : MonoBehaviour
         materialBlock.SetInt("_IsLODActive", 0);     
     }
 
+    // Aktualizuje data 
     void UpdateData()
     {
         PlanetData.CameraPosition = camera.transform.position;
@@ -90,7 +93,7 @@ public class PlanetController : MonoBehaviour
         materialBlock.SetVector("_PlanetInfo", planetInfo);
         materialBlock.SetInt("_IsTessellation", PlanetData.IsTessellation == true ? 1 : 0 );
 
-        sphere.transform.localScale = new Vector3(planetInfo.x * 1.95f, planetInfo.x * 1.95f, planetInfo.x * 1.95f);
+        sphere.transform.localScale = new Vector3(planetInfo.x * 1.98f, planetInfo.x * 1.98f, planetInfo.x * 1.98f);
     }
 
     void CreateSpehere()
@@ -98,7 +101,7 @@ public class PlanetController : MonoBehaviour
         sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         sphere.AddComponent<BoxCollider>();
         sphere.GetComponent<MeshRenderer>().material = subPlanetMaterial;
-        sphere.transform.localScale = new Vector3(planetInfo.x * 1.95f, planetInfo.x * 1.95f, planetInfo.x * 1.95f);
+        sphere.transform.localScale = new Vector3(planetInfo.x * 1.98f, planetInfo.x * 1.98f, planetInfo.x * 1.98f);
     }
 
     void Update()

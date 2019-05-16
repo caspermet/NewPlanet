@@ -24,7 +24,11 @@ double EdgeTess(double3 wpos0, double3 wpos1, double edgeLen)
 	double len = distance(wpos0, wpos1);
 
 	// vıpoèet samotného tesselaèního faktoru
-	double f = max(len * 32 * 2.8f / ( dist), 1.0);
+	double f = max(len * 2 * _PlanetInfo.z * 2.8f / ( dist), 1.0);
+
+	if (f > 4) {
+		f = 4;
+	}
 	return f;
 }
 
